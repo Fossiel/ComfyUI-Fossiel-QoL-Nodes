@@ -8,7 +8,7 @@ ComfyUI-Fossiel-QoL-Nodes is (what will hopefully become) a suite of custom node
 
 ![FossielCentralControl_v2](images/fcc_v2_ss.png)
 
-This node is your go-to hub for managing settings in WAN 2.2 (MoE) video generation, especially on budget laptops. It simplifies creating video clips in multiple runs (like extending a sequence) and works great for any ComfyUI project, keeping things organized and easy.
+This node is your go-to hub for managing settings in ComfyUI. It's specifically geared towards Mixture of Experts (MoE) video generation like WAN2.2, especially on budget laptops. It simplifies creating video clips in multiple consecutive runs (like extending a sequence) but it's versatile enough to work great for any ComfyUI project, keeping things organized and easy.
 
 #### Specifications
 

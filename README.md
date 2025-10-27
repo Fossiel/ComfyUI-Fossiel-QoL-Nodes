@@ -60,16 +60,26 @@ This node is your go-to hub for managing settings in ComfyUI. It's specifically 
 - This node is a lifesaver for WAN 2.2 video projects, letting you control resolution, video length, and AI settings in one place, perfect for low-spec laptops.
 - It automatically adjusts resolutions to work with the AI while keeping your desired look, and splits sampling steps for advanced workflows.
 - The naming options make it easy to organize multiple video clips, and the first-generation switch helps automate setup changes for clip extensions.
+  
+  
+### Sensor Switches
 
+![SensorSwitches](images/sen_sw_ss.png)
+
+This is a set of 8 switches with a special ability: Besides being able to function like any other switch, these switches will detect which of their 2 input ports are active and send that to the output. This is particularly useful in workflows where group or node bypassing is present. Let's say, for example, you want to send either a generated or a loaded image to another node's input. You would then connect the VAE Decode node's output to one of the Sensor Switch Image node's first input and a Load Image node to the second input. Whichever is not bypassed, will be sent to the following node. If both inputs are active, the True/False toggle becomes active and the switch works like any other switch.
+  
+  
 #### Installation Instructions
 1. Clone or download this repository to your local machine.
 2. Copy the repository folder to your ComfyUI custom nodes directory: ComfyUI/custom_nodes/
 3. Ensure dependencies (e.g., PyTorch, ComfyUI’s sampler libraries) are installed. These are typically included with ComfyUI.
-4. Restart ComfyUI to load the `FossielCentralControl_v2` node.
+4. Restart ComfyUI to load the Fossiel Quality of Life nodes.
 5. Find the node in ComfyUI under the category `Fossiel/QoL`.
 
 ## History
+2025/10/27 - Added Sensor Switch Nodes.  
 2025/10/26 – Launched with Fossiel Central Control node.
+
 
 ## Credits
 - Developed with help from Grok3

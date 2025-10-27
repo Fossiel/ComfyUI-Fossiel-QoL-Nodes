@@ -66,7 +66,7 @@ This node is your go-to hub for managing settings in ComfyUI. It's specifically 
 
 ![SensorSwitches](images/sen_sw_ss.png)
 
-This is a set of 8 switches with a special ability: Besides being able to function like any other switch, these switches will detect which of their 2 input ports are active and send that to the output. This is particularly useful in workflows where group or node bypassing is present. Let's say, for example, you want to send either a generated or a loaded image to another node's input. You would then connect the VAE Decode node's output to one of the Sensor Switch Image node's first input and a Load Image node to the second input. Whichever is not bypassed, will be sent to the following node. If both inputs are active, the True/False toggle becomes active and the switch works like any other switch.  
+This is a set of 8 switches with a very special ability: Besides being able to function like any other switch, these switches will detect which of their 2 input ports is active and send that to the output. This is particularly useful in workflows where group or node bypassing is present. Let's say, for example, you want to send either a generated or a loaded image to another node's input. You would then connect the VAE Decode node's output to the first input of the Sensor Switch Image node and a Load Image node to the second input. Whichever of the two is not bypassed, will be sent to the destination node. If both inputs are active, the True/False toggle becomes active and the switch works like any other switch.  
   
 IMPORTANT:
 The Sensor Switch Latent node does not currently support the latent format for WAN 2.1 & 2.2

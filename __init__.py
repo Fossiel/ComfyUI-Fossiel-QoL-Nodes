@@ -1,5 +1,6 @@
 from .fccl import FossielCentralControlLite
 from .fcc_v2 import FossielCentralControl_v2
+from .webpw import FossielWebPWrangler
 from .senswitch import (
     FossielSensorSwitchImage,
     FossielSensorSwitchClip,
@@ -21,7 +22,9 @@ NODE_CLASS_MAPPINGS = {
     "Fossiel_Sensor_Switch_Mask": FossielSensorSwitchMask,
     "Fossiel_Sensor_Switch_Model": FossielSensorSwitchModel,
     "Fossiel_Sensor_Switch_VAE": FossielSensorSwitchVAE,
-    "Fossiel_Sensor_KSampler_Switch": FossielSensorKSamplerSwitch
+    "Fossiel_Sensor_KSampler_Switch": FossielSensorKSamplerSwitch,
+    "FossielWebPWrangler": FossielWebPWrangler
+
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -34,5 +37,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Fossiel_Sensor_Switch_Mask": "Sensor Switch Mask",
     "Fossiel_Sensor_Switch_Model": "Sensor Switch Model",
     "Fossiel_Sensor_Switch_VAE": "Sensor Switch VAE",
-    "Fossiel_Sensor_KSampler_Switch": "Sensor KSampler Switch"
+    "Fossiel_Sensor_KSampler_Switch": "Sensor KSampler Switch",
+    "FossielWebPWrangler": "WebP Wrangler"
 }

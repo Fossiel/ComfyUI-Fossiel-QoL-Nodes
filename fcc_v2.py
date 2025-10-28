@@ -24,7 +24,8 @@ class FossielCentralControl_v2:
                 "Sampler": (comfy.samplers.KSampler.SAMPLERS, {"default": "euler", "tooltip": "The sampling algorithm to use for generation"}),
                 "Scheduler": (comfy.samplers.KSampler.SCHEDULERS, {"default": "simple", "tooltip": "The scheduler algorithm to control sampling step distribution"}),
                 "Naming_Suffix": (["None", "Current Gen"], {"default": "None"}),
-                "Name": ("STRING", {"default": "", "multiline": False}),
+                "Project_Name": ("STRING", {"default": "", "multiline": False}),
+                "Scene_Name": ("STRING", {"default": "", "multiline": False}),
                 "Delimiter": ("STRING", {"default": "_", "multiline": False}),
                 "Current_Generation": ("INT", {"default": 1, "min": 1, "max": 100, "step": 1}),
             },
@@ -51,7 +52,7 @@ class FossielCentralControl_v2:
                 Max_Resolution_Width, Max_Resolution_Height,
                 Video_Length, Overlap_Length, Frame_Rate, 
                 steps, Dual_sampler_split_method, Step_split_ratio, cfg, Sampler, Scheduler,
-                Naming_Suffix, Name, Delimiter, Current_Generation,
+                Naming_Suffix, Project_Name, Scene_Name, Delimiter, Current_Generation,
                 image=None):
 
         # Passthroughs
@@ -134,11 +135,23 @@ class FossielCentralControl_v2:
         # First_Gen_Batch_Switch: True (1) if gen_num == 1, else False (0)
         first_gen_batch_switch = 1 if gen_num == 1 else 0
 
-        # Naming logic
-        File_Name = Name
-        if Naming_Suffix == "Current Gen":
+        # === NAMING LOGIC (NEW & IMPROVED) ===
+        parts = []
+        if Project_Name:
+            parts.append(Project_Name)
+        if Scene_Name:
+            parts.append(Scene_Name)
+        if Naming_Suffix == "Current Gen" and parts:  # Only add Gen if there's a base name
             padded_gen = f"{gen_num:03d}"
-            File_Name = f"{Name}{Delimiter}Gen{padded_gen}" if Name else f"Gen{padded_gen}"
+            parts.append(f"Gen{padded_gen}")
+
+        # Join with delimiter only if needed
+        if len(parts) > 1:
+            File_Name = Delimiter.join(parts)
+        elif len(parts) == 1:
+            File_Name = parts[0]
+        else:
+            File_Name = ""  # Both empty → empty string
 
         # Step splitter with ratio
         KSampler_1_End_Step = round(processed_steps * Step_split_ratio)
@@ -146,7 +159,7 @@ class FossielCentralControl_v2:
         # Cap KSampler_1_End_Step based on Dual_sampler_split_method
         max_end_step = processed_steps - 1 if Dual_sampler_split_method == "Repeat_last_step" else processed_steps - 2
         KSampler_1_End_Step = min(KSampler_1_End_Step, max_end_step)
-        KSampler_1_End_Step = max(1, KSampler_1_End_Step)  # Ensure at least 1 step
+        KSampler_1_End_Step = max(1, KSampler_1_End_Step)  # Ensure atest 1 step
 
         # Set KSampler_2_Start_Step based on Dual_sampler_split_method
         if Dual_sampler_split_method == "Repeat_last_step":

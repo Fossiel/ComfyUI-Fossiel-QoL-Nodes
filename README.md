@@ -125,15 +125,15 @@ The Sensor Switch Latent node does not currently support the latent format for W
 
 
 ## History
-2025/10/28 - Added WebP Wrangler for animated WebP loading with frame range control.
-2025/10/28 - Updated FossielCentralControl_v2: Added Project_Name, renamed Name → Scene_Name, improved naming logic (no double delimiters).
-2025/10/27 - Added Sensor Switch Nodes.
+2025/10/28 - Added WebP Wrangler for animated WebP loading with frame range control.  
+2025/10/28 - Updated FossielCentralControl_v2: Added Project_Name, renamed Name → Scene_Name, improved naming logic (no double delimiters).  
+2025/10/27 - Added Sensor Switch Nodes.  
 2025/10/26 – Launched with Fossiel Central Control node.  
   
 
 ## Credits  
-Developed with help from Grok3
-All the developers who make tools available to everyone using local AI
-Model developers for supplying fantastic open source models, free of charge.
+Developed with help from Grok3  
+All the developers who make tools available to everyone using local AI  
+Model developers for supplying fantastic open source models, free of charge.  
 
 

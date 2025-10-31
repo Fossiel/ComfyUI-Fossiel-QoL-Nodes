@@ -1,3 +1,5 @@
+import comfy.latent_formats
+
 class FossielSensorSwitchImage:
     @classmethod
     def INPUT_TYPES(cls):
@@ -79,6 +81,9 @@ class FossielSensorSwitchConditioning:
             return (conditioning_true if switch else conditioning_false,)
         return (None,)
 
+# ------------------------------------------------------------
+# FossielSensorSwitchLatent – universal version (normal + WAN)
+# ------------------------------------------------------------
 class FossielSensorSwitchLatent:
     @classmethod
     def INPUT_TYPES(cls):
@@ -97,14 +102,39 @@ class FossielSensorSwitchLatent:
     FUNCTION = "switch"
     CATEGORY = "Fossiel/QoL"
 
+    def _to_raw(self, latent_dict):
+        """
+        Convert a WAN latent dict to the raw tensor that KSampler expects.
+        Normal latents are returned unchanged.
+        """
+        samples = latent_dict["samples"]
+
+        # WAN nodes store the format object under this key
+        fmt = latent_dict.get("latent_format")
+        if fmt is not None and isinstance(fmt, (comfy.latent_formats.Wan21,
+                                               comfy.latent_formats.Wan22)):
+            # `process_in` undoes the scaling that `process_out` applied
+            samples = fmt.process_in(samples)
+
+        # Return a *new* dict – never mutate the original
+        return {"samples": samples}
+
     def switch(self, switch, latent_true=None, latent_false=None):
+        # ------------------------------------------------------------------
+        # 1. Early-out cases (exactly the same as your original node)
+        # ------------------------------------------------------------------
         if latent_true is not None and latent_false is None:
-            return (latent_true,)
+            return (self._to_raw(latent_true),)
         if latent_false is not None and latent_true is None:
-            return (latent_false,)
-        if latent_true is not None and latent_false is not None:
-            return (latent_true if switch else latent_false,)
-        return (None,)
+            return (self._to_raw(latent_false),)
+        if latent_true is None and latent_false is None:
+            return ({"samples": None},)   # or raise – you decide
+
+        # ------------------------------------------------------------------
+        # 2. Both inputs present → pick one and normalise it
+        # ------------------------------------------------------------------
+        chosen = latent_true if switch else latent_false
+        return (self._to_raw(chosen),)
 
 class FossielSensorSwitchMask:
     @classmethod
@@ -192,11 +222,14 @@ class FossielSensorKSamplerSwitch:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "switch_model": ("BOOLEAN", {"default": True}),
                 "switch_positive": ("BOOLEAN", {"default": True}),
                 "switch_negative": ("BOOLEAN", {"default": True}),
                 "switch_latent": ("BOOLEAN", {"default": True}),
             },
             "optional": {
+                "model_true": ("MODEL",),
+                "model_false": ("MODEL",),
                 "positive_true": ("CONDITIONING",),
                 "positive_false": ("CONDITIONING",),
                 "negative_true": ("CONDITIONING",),
@@ -206,13 +239,45 @@ class FossielSensorKSamplerSwitch:
             }
         }
 
-    RETURN_TYPES = ("CONDITIONING", "CONDITIONING", "LATENT")
-    RETURN_NAMES = ("positive", "negative", "latent")
+    RETURN_TYPES = ("MODEL", "CONDITIONING", "CONDITIONING", "LATENT")
+    RETURN_NAMES = ("model", "positive", "negative", "latent")
     FUNCTION = "switch"
     CATEGORY = "Fossiel/QoL"
 
-    def switch(self, switch_positive, switch_negative, switch_latent, positive_true=None, positive_false=None, negative_true=None, negative_false=None, latent_true=None, latent_false=None):
-        # Handle positive prompt
+    def _to_raw_latent(self, latent_dict):
+        """Convert WAN latent to raw format expected by KSampler; normal latents unchanged."""
+        if latent_dict is None:
+            return None
+        samples = latent_dict.get("samples")
+        if samples is None:
+            return latent_dict
+
+        fmt = latent_dict.get("latent_format")
+        if fmt is not None and isinstance(fmt, (comfy.latent_formats.Wan21, comfy.latent_formats.Wan22)):
+            samples = fmt.process_in(samples)
+
+        # Return new dict to avoid mutation
+        return {"samples": samples}
+
+    def switch(self,
+               switch_model,
+               switch_positive, switch_negative, switch_latent,
+               model_true=None, model_false=None,
+               positive_true=None, positive_false=None,
+               negative_true=None, negative_false=None,
+               latent_true=None, latent_false=None):
+
+        # === MODEL SWITCH ===
+        if model_true is not None and model_false is None:
+            model_out = model_true
+        elif model_false is not None and model_true is None:
+            model_out = model_false
+        elif model_true is not None and model_false is not None:
+            model_out = model_true if switch_model else model_false
+        else:
+            model_out = None  # or raise? up to you
+
+        # === POSITIVE ===
         if positive_true is not None and positive_false is None:
             positive_out = positive_true
         elif positive_false is not None and positive_true is None:
@@ -222,7 +287,7 @@ class FossielSensorKSamplerSwitch:
         else:
             positive_out = None
 
-        # Handle negative prompt
+        # === NEGATIVE ===
         if negative_true is not None and negative_false is None:
             negative_out = negative_true
         elif negative_false is not None and negative_true is None:
@@ -232,14 +297,15 @@ class FossielSensorKSamplerSwitch:
         else:
             negative_out = None
 
-        # Handle latent
+        # === LATENT (with WAN fix) ===
         if latent_true is not None and latent_false is None:
-            latent_out = latent_true
+            latent_out = self._to_raw_latent(latent_true)
         elif latent_false is not None and latent_true is None:
-            latent_out = latent_false
+            latent_out = self._to_raw_latent(latent_false)
         elif latent_true is not None and latent_false is not None:
-            latent_out = latent_true if switch_latent else latent_false
+            chosen = latent_true if switch_latent else latent_false
+            latent_out = self._to_raw_latent(chosen)
         else:
             latent_out = None
 
-        return (positive_out, negative_out, latent_out)
+        return (model_out, positive_out, negative_out, latent_out)

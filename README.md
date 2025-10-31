@@ -72,7 +72,7 @@ This node is your go-to hub for managing settings in ComfyUI. It simplifies crea
 
 ![WebP Wrangler](images/webpw_ss.png)
 
-Load and extract frames from animated WebP files with full control over range and output.
+This node allows you to load and use animated WebP files, as though they were proper videos. You can manipulate the animated batch to your liking or output single frames. It also supports WebP files with an alpha channel.
 
 #### Specifications
 
@@ -111,8 +111,8 @@ Load and extract frames from animated WebP files with full control over range an
 
 This is a set of 8 switches with a very special ability: Besides being able to function like any other switch, these switches will detect which of their 2 input ports is active and send that to the output. This is particularly useful in workflows where group or node bypassing is present. Let's say, for example, you want to send either a generated or a loaded image to another node's input. You would then connect the VAE Decode node's output to the first input of the Sensor Switch Image node and a Load Image node to the second input. Whichever of the two is not bypassed, will be sent to the destination node. If both inputs are active, the True/False toggle becomes active and the switch works like any other switch.  
   
-IMPORTANT:
-The Sensor Switch Latent node does not currently support the latent format for WAN 2.1 & 2.2
+Updated:  
+The Sensor Switch Latent now also supports the latent format for WAN 2.1 & 2.2
   
   
 #### Installation Instructions
@@ -125,6 +125,8 @@ The Sensor Switch Latent node does not currently support the latent format for W
 
 
 ## History
+2025/10/31 - Updated the Sensor KSampler Switch to have switching support for all KSampler and KSampler (Advanced) input ports.  
+2025/10/31 - Added WAN 2.1 & 2.2 support to the Sensor Switch Latent node.  
 2025/10/28 - Added WebP Wrangler for animated WebP loading with frame range control.  
 2025/10/28 - Updated FossielCentralControl_v2: Added Project_Name, renamed Name → Scene_Name, improved naming logic (no double delimiters).  
 2025/10/27 - Added Sensor Switch Nodes.  

@@ -1,6 +1,7 @@
 from .fccl import FossielCentralControlLite
 from .fcc_v2 import FossielCentralControl_v2
 from .webpw import FossielWebPWrangler
+from .qss import FossielQwenSizeStabilizer
 from .senswitch import (
     FossielSensorSwitchImage,
     FossielSensorSwitchClip,
@@ -15,6 +16,7 @@ from .senswitch import (
 NODE_CLASS_MAPPINGS = {
     "FossielCentralControlLite": FossielCentralControlLite,
     "FossielCentralControl_v2": FossielCentralControl_v2,
+    "Fossiel_Qwen_Size_Stabilizer": FossielQwenSizeStabilizer,
     "Fossiel_Sensor_Switch_Image": FossielSensorSwitchImage,
     "Fossiel_Sensor_Switch_Clip": FossielSensorSwitchClip,
     "Fossiel_Sensor_Switch_Conditioning": FossielSensorSwitchConditioning,
@@ -30,6 +32,7 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "FossielCentralControlLite": "Fossiel Central Control Lite",
     "FossielCentralControl_v2": "Fossiel Central Control v2",
+    "Fossiel_Qwen_Size_Stabilizer": "Qwen Size Stabilizer",
     "Fossiel_Sensor_Switch_Image": "Sensor Switch Image",
     "Fossiel_Sensor_Switch_Clip": "Sensor Switch Clip",
     "Fossiel_Sensor_Switch_Conditioning": "Sensor Switch Conditioning",

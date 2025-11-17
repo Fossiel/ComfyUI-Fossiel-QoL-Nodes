@@ -68,6 +68,25 @@ This node is your go-to hub for managing settings in ComfyUI. It simplifies crea
 
 ---
 
+### Sensor Switches
+
+![SensorSwitches](images/sen_sw_ss.png)
+
+This is a set of 8 switches with a very special ability: Besides being able to function like any other switch, these switches will detect which of their 2 input ports is active and send that to the output. This is particularly useful in workflows where group or node bypassing is present. Let's say, for example, you want to send either a generated or a loaded image to another node's input. You would then connect the VAE Decode node's output to the first input of the Sensor Switch Image node and a Load Image node to the second input. Whichever of the two is not bypassed, will be sent to the destination node. If both inputs are active, the True/False toggle becomes active and the switch works like any other switch.  
+
+*IMPORTANT*: Due to ComfyUI's ability to allow data to pass through a bypassed node, the sensor nodes won't automatically switch when such a pass through situation occurs. To be safe, always switch to the desired input manually. Even with this limitation, these nodes will not error out if an input is not detected, which still makes the extremely useful.  
+
+*Updated 2025/10/31*:  
+The Sensor Switch Latent now also supports the latent format for WAN 2.1 & 2.2
+
+---
+
+![Qwen Size Stabilizer](images/qss_ss.png)
+
+If you've worked with Qwen Image Edit 2509 for any extended period of time, you will have probably experienced the unpredictability of the output when the resolution is set to a larger value than 1 megapixel (1024x1024). The Qwen Size Stabilizer node seeks to address this issue by allowing you to set an aspect ratio from a list of commonly used ones and the orientation of it. The resulting output is the exact chosen aspect ratio which is divisible by 2 and is as close as possible to the 1MP ceiling. Some aspects may exceed the 1MP threshold but by so little that the effect is neglegable.  
+
+---
+
 ### WebP Wrangler
 
 ![WebP Wrangler](images/webpw_ss.png)
@@ -104,18 +123,9 @@ This node allows you to load and use animated WebP files, as though they were pr
 - Frame rate is calculated from animation timestamps.
 
 ---
+---
 
-### Sensor Switches
-
-![SensorSwitches](images/sen_sw_ss.png)
-
-This is a set of 8 switches with a very special ability: Besides being able to function like any other switch, these switches will detect which of their 2 input ports is active and send that to the output. This is particularly useful in workflows where group or node bypassing is present. Let's say, for example, you want to send either a generated or a loaded image to another node's input. You would then connect the VAE Decode node's output to the first input of the Sensor Switch Image node and a Load Image node to the second input. Whichever of the two is not bypassed, will be sent to the destination node. If both inputs are active, the True/False toggle becomes active and the switch works like any other switch.  
-  
-Updated:  
-The Sensor Switch Latent now also supports the latent format for WAN 2.1 & 2.2
-  
-  
-#### Installation Instructions
+### Installation Instructions
 1. Clone or download this repository to your local machine.
 2. Copy the repository folder to your ComfyUI custom nodes directory: `ComfyUI/custom_nodes/`
 3. Install dependencies by running:
@@ -123,15 +133,18 @@ The Sensor Switch Latent now also supports the latent format for WAN 2.1 & 2.2
 4. Restart ComfyUI to load the Fossiel Quality of Life nodes.
 5. Find the nodes in ComfyUI under the category Fossiel/QoL.
 
+---
 
 ## History
+2025/11/17 - Added Qwen Size Stabilizer for predictable Qwen generations.
 2025/10/31 - Updated the Sensor KSampler Switch to have switching support for all KSampler and KSampler (Advanced) input ports.  
 2025/10/31 - Added WAN 2.1 & 2.2 support to the Sensor Switch Latent node.  
 2025/10/28 - Added WebP Wrangler for animated WebP loading with frame range control.  
 2025/10/28 - Updated FossielCentralControl_v2: Added Project_Name, renamed Name → Scene_Name, improved naming logic (no double delimiters).  
 2025/10/27 - Added Sensor Switch Nodes.  
 2025/10/26 – Launched with Fossiel Central Control node.  
-  
+
+---
 
 ## Credits  
 Developed with help from Grok3  

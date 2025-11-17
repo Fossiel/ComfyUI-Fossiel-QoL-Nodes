@@ -136,7 +136,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
-2025/11/17 - Added Qwen Size Stabilizer for predictable Qwen generations.
+2025/11/17 - Added Qwen Size Stabilizer for predictable Qwen generations.  
 2025/10/31 - Updated the Sensor KSampler Switch to have switching support for all KSampler and KSampler (Advanced) input ports.  
 2025/10/31 - Added WAN 2.1 & 2.2 support to the Sensor Switch Latent node.  
 2025/10/28 - Added WebP Wrangler for animated WebP loading with frame range control.  

@@ -97,6 +97,31 @@ This node allows you to load and manipulate image sequences, as though they were
 
 ***Important:*** *This node does not support animated image formats such as WebP and GIF. However, it does support static images in these formats.*  
 
+#### Specifications
+
+**Inputs:**
+1. **Sequence_Dir** – Full path to the directory containing the sequence. (e.g., `C:\path\to\directory`).  
+2. **Load Mode** – Choose how to extract frames:  
+   - `All` – Load every frame  
+   - `From first to Index 1` – Frames 0 to value of Index_1  
+   - `From Index 1 to last` – Value of Index_1 to final frame  
+   - `Index 1 to Index 2` – Between two indices  
+   - `First frame` – Only frame 0  
+   - `Last frame` – Final frame  
+   - `Index 1 frame` – Single frame at value of Index_1  
+   (Important: For all batch modes, the range includes the indexed frame(s). E.g. In `From first to Index 1` mode, with an index value of 3, a batch count of 4 will be output.)  
+3. **Missing_Alpha_Handling** – Choose how to handle images without an alpha channel:  
+   - `Opaque` – Will output a solid white mask frame  
+   - `Transparent` – Will output a solid black mask frame  
+4. **Index 1** – First index for range-based modes (0-based).  
+5. **Index 2** – Second index for `Index 1 to Index 2` mode. (Ignored for all other modes)  
+
+**Outputs:**
+1. **images** – Batch of RGB frames as `IMAGE` tensor (float32, 0–1).  
+2. **Alpha as mask** – Alpha channel as grayscale mask (1.0 = opaque). Solid alpha (all 0 or 1) is normalized to 1.0.  
+3. **total_batch_count** – Total number of frames in the sequence.  
+4. **split_batch_count** – Number of frames actually loaded.  
+
 ---
 
 ### WebP Wrangler

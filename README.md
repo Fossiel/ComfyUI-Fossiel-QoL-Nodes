@@ -81,6 +81,8 @@ The Sensor Switch Latent now also supports the latent format for WAN 2.1 & 2.2
 
 ---
 
+### Qwen Size Stabilizer
+
 ![Qwen Size Stabilizer](images/qss_ss.png)
 
 If you've worked with Qwen Image Edit 2509 for any extended period of time, you will have probably experienced the unpredictability of the output when the resolution is set to a larger value than 1 megapixel (1024x1024). The Qwen Size Stabilizer node seeks to address this issue by allowing you to set an aspect ratio from a list of commonly used ones and the orientation of it. The resulting output is the exact chosen aspect ratio which is divisible by 2 and is as close as possible to the 1MP ceiling. Some aspects may exceed the 1MP threshold but by so little that the effect is neglegable.  

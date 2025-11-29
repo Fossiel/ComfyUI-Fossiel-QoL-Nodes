@@ -87,6 +87,16 @@ If you've worked with Qwen Image Edit 2509 for any extended period of time, you 
 
 ---
 
+### Sequence Wrangler
+
+![Sequence Wrangler](images/seqw_ss.png)
+
+This node allows you to load and manipulate image sequences, as though they were videos. You can manipulate the output batch to your liking or output single frames. It also supports image files with an alpha channel.  
+
+***Important:*** *This node does not support animated image formats such as WebP and GIF. However, it does support static images in these formats.*  
+
+---
+
 ### WebP Wrangler
 
 ![WebP Wrangler](images/webpw_ss.png)
@@ -136,6 +146,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2025/11/29 - Added Sequence Wrangler for loading and manipulation of image sequences.  
 2025/11/17 - Added Qwen Size Stabilizer for predictable Qwen generations.  
 2025/10/31 - Updated the Sensor KSampler Switch to have switching support for all KSampler and KSampler (Advanced) input ports.  
 2025/10/31 - Added WAN 2.1 & 2.2 support to the Sensor Switch Latent node.  

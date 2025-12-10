@@ -35,11 +35,11 @@ class FossielSequenceWrangler:
 
     def _check_for_animated_files(self, directory: str):
         """Reject directory if it contains any animated WebP or GIF"""
-        dir_path = Path(directory)
-        if not dir.is_dir():
+        dir_path = Path(directory)          # <-- renamed to dir_path to avoid shadowing builtin
+        if not dir_path.is_dir():           # <-- now it's a real Path object
             return
 
-        for file_path in dir.iterdir():
+        for file_path in dir_path.iterdir():
             if not file_path.is_file():
                 continue
             suffix = file_path.suffix.lower()

@@ -173,6 +173,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2025/12/10 - Fixed the loading bug in Sequence Wrangler.  
 2025/11/29 - Added Sequence Wrangler for loading and manipulation of image sequences.  
 2025/11/17 - Added Qwen Size Stabilizer for predictable Qwen generations.  
 2025/10/31 - Updated the Sensor KSampler Switch to have switching support for all KSampler and KSampler (Advanced) input ports.  

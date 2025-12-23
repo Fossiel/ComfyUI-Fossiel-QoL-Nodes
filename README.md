@@ -80,7 +80,7 @@ On the surface, it's yet another brightness and contrast adjuster. However, this
 
 **Inputs:**
 1. **image** – The image to be adjusted (required)  
-2. **reference_image** – The reference imagage of which the levels are to be matched (optional)  
+2. **reference_image** – The reference image of which the levels are to be matched (optional)  
 
 **Parameters:**  
 1. **Match** – Choose what levels to match/adjust:  

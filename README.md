@@ -68,6 +68,33 @@ This node is your go-to hub for managing settings in ComfyUI. It simplifies crea
 
 ---
 
+### Image Level Matchmaker
+
+![Image Level Matchmaker](images/lvl_mm.png)
+
+On the surface, it's yet another brightness and contrast adjuster. However, this node allows you to match the brightness and contrast levels from a reference image, in addition to normal level settings. It was developed with the aim of adjusting greyscale images but it's equally as effective on color images. The levels can be fine tuned using the parameters.  
+
+***Important:*** *When loading a batch of images, only the first frame will be used to match the levels in order to prevent flickering*  
+
+#### Specifications
+
+**Inputs:**
+1. **image** – The image to be adjusted (required)  
+2. **reference_image** – The reference imagage of which the levels are to be matched (optional)  
+
+**Parameters:**  
+1. **Match** – Choose what levels to match/adjust:  
+   - `Brightness & Contrast` – Match/Adjust both brightness & contrast  
+   - `Brightness` – Match/Adjust only brightness  
+   - `Contrast` – Match/Adjust only contrast  
+2. **Brightness_offset** – Fine tune/Adjust brightness (-1.00–1.00).  
+3. **Contrast_offset** – Fine tune/Adjust contrast (-1.00–1.00).  
+
+**Outputs:**
+1. **IMAGE** – Adjusted image  
+
+---
+
 ### Sensor Switches
 
 ![SensorSwitches](images/sen_sw_ss.png)
@@ -99,7 +126,7 @@ This node allows you to load and manipulate image sequences, as though they were
 
 #### Specifications
 
-**Inputs:**
+**Parameters:**
 1. **Sequence_Dir** – Full path to the directory containing the sequence. (e.g., `C:\path\to\directory`).  
 2. **Load Mode** – Choose how to extract frames:  
    - `All` – Load every frame  
@@ -173,6 +200,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2025/12/23 - Added Image Level Matchmaker
 2025/12/10 - Fixed the loading bug in Sequence Wrangler.  
 2025/11/29 - Added Sequence Wrangler for loading and manipulation of image sequences.  
 2025/11/17 - Added Qwen Size Stabilizer for predictable Qwen generations.  

@@ -68,9 +68,17 @@ This node is your go-to hub for managing settings in ComfyUI. It simplifies crea
 
 ---
 
-### Image Level Matchmaker
+### Denoise Precision KSampler
 
-![Image Level Matchmaker](images/lvl_mm.png)
+![SensorSwitches](images/dpks_ss.png)
+
+This node is an exact clone of the ComfyUI core KSampler with only one difference -> The Denoise parameter is represented as a percentage instead of a fraction. This effectively adds 2 decimal places to the value and allows for extremely precise settings.  
+
+---
+
+### Image Level Matcher
+
+![Image Level Matcher](images/lvlm_ss.png)
 
 On the surface, it's yet another brightness and contrast adjuster. However, this node allows you to match the brightness and contrast levels from a reference image, in addition to normal level settings. It was developed with the aim of adjusting greyscale images but it's equally as effective on color images. The levels can be fine tuned using the parameters.  
 
@@ -80,15 +88,25 @@ On the surface, it's yet another brightness and contrast adjuster. However, this
 
 **Inputs:**
 1. **image** – The image to be adjusted (required)  
-2. **reference_image** – The reference image of which the levels are to be matched (optional)  
+2. **Brightness_Ref** – Reference image for brightness matching (optional)  
+3. **Contrast_Ref** – Reference image for contrast matching (optional)  
+4. **Saturation_Ref** – Reference image for saturation matching (optional)  
 
 **Parameters:**  
 1. **Match** – Choose what levels to match/adjust:  
-   - `Brightness & Contrast` – Match/Adjust both brightness & contrast  
-   - `Brightness` – Match/Adjust only brightness  
-   - `Contrast` – Match/Adjust only contrast  
-2. **Brightness_offset** – Fine tune/Adjust brightness (-1.00–1.00).  
-3. **Contrast_offset** – Fine tune/Adjust contrast (-1.00–1.00).  
+   - `All` *(default)* – Match/Adjust all parameters  
+   - `Brightness Only` – Match/Adjust only brightness  
+   - `Contrast Only` – Match/Adjust only contrast  
+   - `Saturation Only` – Match/Adjust only contrast  
+   - `Brightness & Contrast` – Match/Adjust brightness & contrast  
+   - `Brightness & Saturation` – Match/Adjust brightness & saturation  
+   - `Contrast & Saturation` – Match/Adjust contrast & saturation  
+2. **Brightness_offset** – Fine tune/Adjust brightness (-1.000–1.000).  
+3. **Contrast_offset** – Fine tune/Adjust contrast (-1.000–1.000).  
+4. **Saturation_offset** – Fine tune/Adjust saturation (-1.000–2.000).  
+5. **Saturation_algorithm** – Choose what levels to match/adjust:  
+   - `Global` – Will match based on the mean saturation level of the reference  
+   - `Midtone-Weighted` *(default)* – Will match based on the highlight, midtone & shadow saturation levels of the reference  
 
 **Outputs:**
 1. **IMAGE** – Adjusted image  
@@ -108,7 +126,7 @@ The Sensor Switch Latent now also supports the latent format for WAN 2.1 & 2.2
 
 ---
 
-### Qwen Size Stabilizer
+### Qwen Size Stabilizer (No Longer in this pack. Moved it to ComfyUI-Fossiel-QwenHelpers)
 
 ![Qwen Size Stabilizer](images/qss_ss.png)
 
@@ -200,7 +218,14 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
-2025/12/23 - Added Image Level Matchmaker
+2026/02/07 - Added Denoise Precision KSampler node  
+2026/02/07 - Added Video De-flicker node  
+2026/02/07 - Fixed a bug in Sensor Switch Latent and Sensor Switch KSampler that prevented inpainting latents from being passed correctly.  
+2026/02/07 - Renamed Image Level Matchmaker to Image Level Matcher  
+2026/02/07 - Adjusted setting tolerances from 0.01 to 0.001 in Image Level Matchmaker  
+2026/02/07 - Moved Qwen Size Stabilizer to ComfyUI-Fossiel-QwenHelpers.  
+2025/12/28 - Updated Image Level Matchmaker.  
+2025/12/23 - Added Image Level Matchmaker  
 2025/12/10 - Fixed the loading bug in Sequence Wrangler.  
 2025/11/29 - Added Sequence Wrangler for loading and manipulation of image sequences.  
 2025/11/17 - Added Qwen Size Stabilizer for predictable Qwen generations.  

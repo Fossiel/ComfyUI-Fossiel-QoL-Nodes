@@ -104,35 +104,32 @@ class FossielSensorSwitchLatent:
 
     def _to_raw(self, latent_dict):
         """
-        Convert a WAN latent dict to the raw tensor that KSampler expects.
-        Normal latents are returned unchanged.
+        Convert a WAN latent dict to raw format while preserving ALL other keys
+        (especially noise_mask, batch_index, etc.)
         """
-        samples = latent_dict["samples"]
+        if latent_dict is None:
+            return None
 
-        # WAN nodes store the format object under this key
-        fmt = latent_dict.get("latent_format")
+        # Make a shallow copy to avoid mutating the original
+        result = latent_dict.copy()
+        samples = result["samples"]
+
+        fmt = result.get("latent_format")
         if fmt is not None and isinstance(fmt, (comfy.latent_formats.Wan21,
                                                comfy.latent_formats.Wan22)):
-            # `process_in` undoes the scaling that `process_out` applied
             samples = fmt.process_in(samples)
 
-        # Return a *new* dict – never mutate the original
-        return {"samples": samples}
+        result["samples"] = samples
+        return result
 
     def switch(self, switch, latent_true=None, latent_false=None):
-        # ------------------------------------------------------------------
-        # 1. Early-out cases (exactly the same as your original node)
-        # ------------------------------------------------------------------
         if latent_true is not None and latent_false is None:
             return (self._to_raw(latent_true),)
         if latent_false is not None and latent_true is None:
             return (self._to_raw(latent_false),)
         if latent_true is None and latent_false is None:
-            return ({"samples": None},)   # or raise – you decide
+            return ({"samples": None},)
 
-        # ------------------------------------------------------------------
-        # 2. Both inputs present → pick one and normalise it
-        # ------------------------------------------------------------------
         chosen = latent_true if switch else latent_false
         return (self._to_raw(chosen),)
 
@@ -245,19 +242,19 @@ class FossielSensorKSamplerSwitch:
     CATEGORY = "Fossiel/QoL"
 
     def _to_raw_latent(self, latent_dict):
-        """Convert WAN latent to raw format expected by KSampler; normal latents unchanged."""
+        """Preserve full latent dict, only convert samples if WAN format"""
         if latent_dict is None:
             return None
-        samples = latent_dict.get("samples")
-        if samples is None:
-            return latent_dict
 
-        fmt = latent_dict.get("latent_format")
+        result = latent_dict.copy()
+        samples = result["samples"]
+
+        fmt = result.get("latent_format")
         if fmt is not None and isinstance(fmt, (comfy.latent_formats.Wan21, comfy.latent_formats.Wan22)):
             samples = fmt.process_in(samples)
 
-        # Return new dict to avoid mutation
-        return {"samples": samples}
+        result["samples"] = samples
+        return result
 
     def switch(self,
                switch_model,

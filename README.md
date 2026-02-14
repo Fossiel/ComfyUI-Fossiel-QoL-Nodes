@@ -136,8 +136,8 @@ One of the many powerful use cases: if you're not blessed with a monster GPU and
 5. **Resize_by** – Controls how the target resolution / pixel budget is calculated  
    - `Max Resolution` (default) – Use the Max_Resolution_X × Max_Resolution_Y product as hard pixel cap  
    - `Ratio` – Scale from the cropped size by the Ratio percentage  
-6. **Max_Resolution_X** – Maximum width allowed when Resize_by = Max Resolution (default: 1024)  
-7. **Max_Resolution_Y** – Maximum height allowed when Resize_by = Max Resolution (default: 1024)  
+6. **Max_Resolution_X** – Width for pixel cap calculation (default: 1024)  
+7. **Max_Resolution_Y** – Height for pixel cap calculation (default: 1024)  
 8. **Ratio** – Percentage scaling factor from cropped size when Resize_by = Ratio (default: 100.0, min: 0.10, max: 10000.0)  
 9. **Aspect_tolerance** – Output dimensions must be divisible by this value (8 or 16) – ensures perfect VAE compatibility  
 10. **Resizing_method** – Interpolation method for final resize  
@@ -268,7 +268,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
-2026/02/14 - Added Resolution Wrangler
+2026/02/14 - Added Resolution Wrangler  
 2026/02/07 - Added Denoise Precision KSampler node  
 2026/02/07 - Added Video De-flicker node  
 2026/02/07 - Fixed a bug in Sensor Switch Latent and Sensor Switch KSampler that prevented inpainted latents from being passed correctly.  

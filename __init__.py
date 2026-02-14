@@ -1,7 +1,9 @@
+from .deflicker import FossielVideoDeflicker
+from .dpks import FossielDenoisePrecisionKSampler
 from .fccl import FossielCentralControlLite
 from .fcc_v2 import FossielCentralControl_v2
-from .lvl_mm import FossielLevelMatchmaker
-from .qss import FossielQwenSizeStabilizer
+from .lvl_m import FossielLevelMatcher
+from .resw import FossielResolutionWrangler
 from .seqw import FossielSequenceWrangler
 from .webpw import FossielWebPWrangler
 from .senswitch import (
@@ -18,8 +20,9 @@ from .senswitch import (
 NODE_CLASS_MAPPINGS = {
     "FossielCentralControlLite": FossielCentralControlLite,
     "FossielCentralControl_v2": FossielCentralControl_v2,
-    "FossielLevelMatchmaker": FossielLevelMatchmaker,
-    "Fossiel_Qwen_Size_Stabilizer": FossielQwenSizeStabilizer,
+    "FossielDenoisePrecisionKSampler": FossielDenoisePrecisionKSampler,
+    "FossielLevelMatcher": FossielLevelMatcher,
+    "FossielResolutionWrangler": FossielResolutionWrangler,
     "Fossiel_Sensor_Switch_Image": FossielSensorSwitchImage,
     "Fossiel_Sensor_Switch_Clip": FossielSensorSwitchClip,
     "Fossiel_Sensor_Switch_Conditioning": FossielSensorSwitchConditioning,
@@ -29,14 +32,16 @@ NODE_CLASS_MAPPINGS = {
     "Fossiel_Sensor_Switch_VAE": FossielSensorSwitchVAE,
     "Fossiel_Sensor_KSampler_Switch": FossielSensorKSamplerSwitch,
     "FossielSequenceWrangler": FossielSequenceWrangler,
+    "FossielVideoDeflicker": FossielVideoDeflicker,
     "FossielWebPWrangler": FossielWebPWrangler
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "FossielCentralControlLite": "Fossiel Central Control Lite",
     "FossielCentralControl_v2": "Fossiel Central Control v2",
-    "FossielLevelMatchmaker": "Image Level Matchmaker",
-    "Fossiel_Qwen_Size_Stabilizer": "Qwen Size Stabilizer",
+    "FossielDenoisePrecisionKSampler": "Denoise Precision KSampler",
+    "FossielLevelMatcher": "Image Level Matcher",
+    "FossielResolutionWrangler": "Resolution Wrangler",
     "Fossiel_Sensor_Switch_Image": "Sensor Switch Image",
     "Fossiel_Sensor_Switch_Clip": "Sensor Switch Clip",
     "Fossiel_Sensor_Switch_Conditioning": "Sensor Switch Conditioning",
@@ -46,5 +51,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Fossiel_Sensor_Switch_VAE": "Sensor Switch VAE",
     "Fossiel_Sensor_KSampler_Switch": "Sensor KSampler Switch",
     "FossielSequenceWrangler": "Sequence Wrangler",
+    "FossielVideoDeflicker": "Video De-flicker",
     "FossielWebPWrangler": "WebP Wrangler"
 }

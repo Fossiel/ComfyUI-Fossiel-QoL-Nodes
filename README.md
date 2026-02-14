@@ -113,6 +113,56 @@ On the surface, it's yet another brightness and contrast adjuster. However, this
 
 ---
 
+### Resolution Wrangler
+
+![Resolution Wrangler](images/resw_ss.png)
+
+Resolution Wrangler is the ultimate VAE-compatible image sizer for ComfyUI. It automatically calculates the closest clean, non-fractional aspect ratio from your input image (or lets you set a manual ratio), crops the image perfectly to fill that aspect while preserving your chosen crop position, and then resizes the result to the largest size that maintains the **exact** aspect ratio, stays divisible by your selected VAE tolerance (8 or 16), and fits within your desired pixel budget.
+
+The resulting image is **100% VAE compatible** at any size — no fractional scaling artifacts, no aspect drift, no wasted pixels.  
+
+One of the many powerful use cases: if you're not blessed with a monster GPU and want to generate the largest possible 16:9 (or any other ratio) video or batch your hardware can comfortably handle, Resolution Wrangler will find the maximum clean resolution for you — every single time.
+
+#### Specifications
+
+**Parameters:**
+1. **Aspect_method** – How to determine the target aspect ratio  
+   - `Automatic` – Finds the closest clean integer ratio to the input image  
+   - `Manual` – Use the user-defined Aspect_X : Aspect_Y ratio  
+2. **Aspect_X** – Numerator of the manual aspect ratio (default: 4)  
+3. **Aspect_Y** – Denominator of the manual aspect ratio (default: 3)  
+4. **Crop_position** – Where to place the crop when expanding to fill the target aspect  
+   - Options include: Center (default), Left and Top, Right and Bottom, X-Center and Top, etc.  
+5. **Resize_by** – Controls how the target resolution / pixel budget is calculated  
+   - `Max Resolution` (default) – Use the Max_Resolution_X × Max_Resolution_Y product as hard pixel cap  
+   - `Ratio` – Scale from the cropped size by the Ratio percentage  
+6. **Max_Resolution_X** – Maximum width allowed when Resize_by = Max Resolution (default: 1024)  
+7. **Max_Resolution_Y** – Maximum height allowed when Resize_by = Max Resolution (default: 1024)  
+8. **Ratio** – Percentage scaling factor from cropped size when Resize_by = Ratio (default: 100.0, min: 0.10, max: 10000.0)  
+9. **Aspect_tolerance** – Output dimensions must be divisible by this value (8 or 16) – ensures perfect VAE compatibility  
+10. **Resizing_method** – Interpolation method for final resize  
+    - `lanczos` (default), `bicubic`, `bilinear`, `nearest-exact`
+
+**Optional Inputs:**
+- **image** – RGB image to process (required for normal operation)  
+- **mask** – Optional mask (ComfyUI convention: 0 = keep/opaque, 1 = masked/transparent) – preserved through cropping & resizing
+
+**Outputs:**
+1. **Aspect_Image** – Cropped RGB image exactly matching the target aspect (before final resize)  
+2. **Aspect_RGBA** – Same as Aspect_Image but with alpha channel (from input mask or fully opaque)  
+3. **Aspect_Mask** – Cropped mask (if provided), ComfyUI convention  
+4. **Resized_Image** – Final RGB image resized to largest VAE-compatible size under the pixel budget  
+5. **Resized_RGBA** – Final resized image with alpha channel applied (inverted mask → alpha)  
+6. **Resized_Mask** – Final resized mask (ComfyUI convention)  
+7. **Aspect_X** – Simplified numerator of the final aspect ratio  
+8. **Aspect_Y** – Simplified denominator of the final aspect ratio  
+9. **Aspect_Image_X** – Width of the Aspect_Image  
+10. **Aspect_Image_Y** – Height of the Aspect_Image  
+11. **Resized_Image_X** – Final resized width  
+12. **Resized_Image_Y** – Final resized height  
+
+---
+
 ### Sensor Switches
 
 ![SensorSwitches](images/sen_sw_ss.png)
@@ -218,9 +268,10 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/02/14 - Added Resolution Wrangler
 2026/02/07 - Added Denoise Precision KSampler node  
 2026/02/07 - Added Video De-flicker node  
-2026/02/07 - Fixed a bug in Sensor Switch Latent and Sensor Switch KSampler that prevented inpainting latents from being passed correctly.  
+2026/02/07 - Fixed a bug in Sensor Switch Latent and Sensor Switch KSampler that prevented inpainted latents from being passed correctly.  
 2026/02/07 - Renamed Image Level Matchmaker to Image Level Matcher  
 2026/02/07 - Adjusted setting tolerances from 0.01 to 0.001 in Image Level Matchmaker  
 2026/02/07 - Moved Qwen Size Stabilizer to ComfyUI-Fossiel-QwenHelpers.  

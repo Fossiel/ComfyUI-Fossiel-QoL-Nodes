@@ -85,14 +85,21 @@ class FossielResolutionWrangler:
         if image.shape[-1] != 3:
             raise ValueError("Input image must be RGB (3 channels).")
 
-        # Prepare mask if connected
+        # Prepare mask if connected **and size matches image**
+        mask_rgb = None
         if mask is not None:
-            if len(mask.shape) == 4:
-                mask = mask.squeeze(-1) if mask.shape[-1] == 1 else mask.mean(dim=-1)
-            mask = mask.clamp_(0, 1)
-            mask_rgb = mask.unsqueeze(-1).repeat(1,1,1,3)
-        else:
-            mask_rgb = None
+            # Common dummy mask size in ComfyUI loaders
+            if mask.shape[1:3] == (64, 64) and (image.shape[1:3] != (64, 64)):
+                print("[ResolutionWrangler] Ignoring 64×64 dummy mask — treating as no mask")
+            else:
+                if len(mask.shape) == 4:
+                    mask = mask.squeeze(-1) if mask.shape[-1] == 1 else mask.mean(dim=-1)
+                mask = mask.clamp_(0, 1)
+                # Optional: add safety check that spatial dims match (very recommended)
+                if mask.shape[1:3] != image.shape[1:3]:
+                    print(f"[ResolutionWrangler] Mask size {mask.shape[1:3]} does not match image {image.shape[1:3]} — ignoring mask")
+                else:
+                    mask_rgb = mask.unsqueeze(-1).repeat(1,1,1,3)
 
         # Target aspect
         if Aspect_method == "Manual":
@@ -135,7 +142,7 @@ class FossielResolutionWrangler:
         # Downscale if oversized
         base_w = aspect_w
         base_h = aspect_h
-        if cropped_pixels > effective_pixel_cap:
+        if cropped_pixels > effective_pixel_cap or not (aspect_w % tolerance == 0 and aspect_h % tolerance == 0):
             print(f"[ResolutionWrangler] Oversized ({cropped_pixels} > {effective_pixel_cap}) → downscaling")
             max_units = min(
                 base_w // target_num,

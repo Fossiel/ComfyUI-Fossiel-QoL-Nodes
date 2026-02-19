@@ -268,6 +268,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/02/19 - Fixed null mask error and 1 to 1 resize bug in Resolution Wrangler  
 2026/02/14 - Added Resolution Wrangler  
 2026/02/07 - Added Denoise Precision KSampler node  
 2026/02/07 - Added Video De-flicker node  

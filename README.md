@@ -136,6 +136,7 @@ One of the many powerful use cases: if you're not blessed with a monster GPU and
 5. **Resize_by** – Controls how the target resolution / pixel budget is calculated  
    - `Max Resolution` (default) – Use the Max_Resolution_X × Max_Resolution_Y product as hard pixel cap  
    - `Ratio` – Scale from the cropped size by the Ratio percentage  
+   - `Max Resolution x Ratio` – Scale by the Ratio percentage of the Max_Resolution_X × Max_Resolution_Y product  
 6. **Max_Resolution_X** – Width for pixel cap calculation (default: 1024)  
 7. **Max_Resolution_Y** – Height for pixel cap calculation (default: 1024)  
 8. **Ratio** – Percentage scaling factor from cropped size when Resize_by = Ratio (default: 100.0, min: 0.10, max: 10000.0)  
@@ -268,6 +269,8 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/02/26 - Added Resolution Wrangler (Express) node.  
+2026/02/26 - Added "Max Resolution x Ratio" option to Resolution Wrangler  
 2026/02/19 - Fixed null mask error and 1 to 1 resize bug in Resolution Wrangler  
 2026/02/14 - Added Resolution Wrangler  
 2026/02/07 - Added Denoise Precision KSampler node  

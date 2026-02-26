@@ -5,7 +5,8 @@ from fractions import Fraction
 from PIL import Image, ImageDraw, ImageFont
 from torchvision.transforms.functional import resize as tv_resize
 from torchvision.transforms import InterpolationMode
-class FossielResolutionWrangler:
+
+class FossielResolutionWranglerXP:
     """
     ResolutionWrangler - adapted for ComfyUI conventions:
     - Input image is expected RGB (3 channels)
@@ -14,6 +15,7 @@ class FossielResolutionWrangler:
     - Always enforces output divisible by Aspect_tolerance
     - Fallback to cropped_aspect * tolerance when cap too low (may slightly exceed cap)
     """
+
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -40,41 +42,41 @@ class FossielResolutionWrangler:
                 "mask": ("MASK",),
             }
         }
+
     RETURN_TYPES = (
         "IMAGE", "IMAGE", "MASK",
-        "IMAGE", "IMAGE", "MASK",
-        "INT", "INT", "INT", "INT", "INT", "INT"
+        "INT", "INT"
     )
     RETURN_NAMES = (
-        "Aspect_Image",
-        "Aspect_RGBA",
-        "Aspect_Mask",
         "Resized_Image",
         "Resized_RGBA",
         "Resized_Mask",
-        "Aspect_X",
-        "Aspect_Y",
-        "Aspect_Image_X",
-        "Aspect_Image_Y",
         "Resized_Image_X",
         "Resized_Image_Y"
     )
+
     FUNCTION = "wrangle"
     CATEGORY = "utils"
+
     def wrangle(self,
                 Aspect_method, Aspect_X, Aspect_Y,
                 Crop_position, Resize_by, Max_Resolution_X, Max_Resolution_Y,
                 Ratio, Aspect_tolerance, Resizing_method,
                 image=None, mask=None):
+
         tolerance = int(Aspect_tolerance)
+
         no_input = image is None
         if no_input:
             print("[ResolutionWrangler] No image → using 1024×1024 black + Manual mode")
             image = self.create_black_starter(1024)
             Aspect_method = "Manual"
+
         print(f"[ResolutionWrangler] Image shape: {image.shape}")
+
         if image.shape[-1] != 3:
             raise ValueError("Input image must be RGB (3 channels).")
+
         # Prepare mask if connected **and size matches image**
         mask_rgb = None
         if mask is not None:
@@ -90,6 +92,7 @@ class FossielResolutionWrangler:
                     print(f"[ResolutionWrangler] Mask size {mask.shape[1:3]} does not match image {image.shape[1:3]} — ignoring mask")
                 else:
                     mask_rgb = mask.unsqueeze(-1).repeat(1,1,1,3)
+
         # Target aspect
         if Aspect_method == "Manual":
             target_num = Aspect_X
@@ -98,17 +101,22 @@ class FossielResolutionWrangler:
             target_num, target_den = self.find_closest_ratio(
                 image.shape[2], image.shape[1], max_side=24
             )
+
         # Crop to aspect
         cropped_rgb, aspect_w, aspect_h = self.expand_and_crop(
             image, target_num, target_den, Crop_position, Aspect_method
         )
+
         if aspect_w != 0 and aspect_h != 0:
             gcd_crop = math.gcd(aspect_w, aspect_h)
             target_num = aspect_w // gcd_crop
             target_den = aspect_h // gcd_crop
+
         if no_input:
             cropped_rgb = self.add_placeholder_text(cropped_rgb, aspect_w, aspect_h)
+
         cropped_pixels = aspect_w * aspect_h
+
         # Determine effective pixel cap
         if Resize_by == "Ratio":
             multiplier = Ratio / 100.0
@@ -119,11 +127,14 @@ class FossielResolutionWrangler:
             effective_pixel_cap = int(base_cap * multiplier)
         else:
             effective_pixel_cap = Max_Resolution_X * Max_Resolution_Y
+
         print(f"[ResolutionWrangler] Mode: {Resize_by} | Effective cap: {effective_pixel_cap}")
+
         # Minimal divisible fallback size based on cropped aspect
         min_w = target_num * tolerance
         min_h = target_den * tolerance
         min_pixels = min_w * min_h
+
         # Downscale if oversized
         base_w = aspect_w
         base_h = aspect_h
@@ -148,15 +159,20 @@ class FossielResolutionWrangler:
                 print(f"[ResolutionWrangler] Downscale too aggressive → fallback to minimal divisible {min_w}×{min_h}")
                 base_w = min_w
                 base_h = min_h
+
         # Even if no downscale, ensure we start from at least minimal if going to upscale
         base_w = max(base_w, min_w)
         base_h = max(base_h, min_h)
+
         # Upscale to largest divisible under cap
         final_w, final_h = self.resize_to_divisible(
             base_w, base_h, target_num, target_den, tolerance, effective_pixel_cap
         )
+
         print(f"[ResolutionWrangler] Final size: {final_w} × {final_h}")
+
         resized_rgb = self.resize_image(cropped_rgb, final_w, final_h, Resizing_method)
+
         # Process mask
         if mask_rgb is not None:
             cropped_mask_rgb, _, _ = self.expand_and_crop(
@@ -168,6 +184,7 @@ class FossielResolutionWrangler:
         else:
             aspect_mask = torch.zeros((cropped_rgb.shape[0], aspect_h, aspect_w), dtype=cropped_rgb.dtype, device=cropped_rgb.device)
             resized_mask = torch.zeros((resized_rgb.shape[0], final_h, final_w), dtype=resized_rgb.dtype, device=resized_rgb.device)
+
         # RGBA: invert mask for alpha
         if mask is not None:
             aspect_alpha = (1.0 - aspect_mask).unsqueeze(-1)
@@ -175,34 +192,33 @@ class FossielResolutionWrangler:
         else:
             aspect_alpha = torch.ones((cropped_rgb.shape[0], aspect_h, aspect_w, 1), dtype=cropped_rgb.dtype, device=cropped_rgb.device)
             resized_alpha = torch.ones((resized_rgb.shape[0], final_h, final_w, 1), dtype=resized_rgb.dtype, device=resized_rgb.device)
+
         aspect_rgba = torch.cat([cropped_rgb, aspect_alpha], dim=-1)
         resized_rgba = torch.cat([resized_rgb, resized_alpha], dim=-1)
+
         # Simplify aspect output
         gcd = math.gcd(target_num, target_den)
         out_aspect_x = target_num // gcd
         out_aspect_y = target_den // gcd
+
         return (
-            cropped_rgb,
-            aspect_rgba,
-            aspect_mask,
             resized_rgb,
             resized_rgba,
             resized_mask,
-            out_aspect_x,
-            out_aspect_y,
-            aspect_w,
-            aspect_h,
             final_w,
             final_h
         )
+
     # ────────────────────────────────────────────────
-    # Unchanged helper methods (create_black_starter, add_placeholder_text,
-    # find_closest_ratio, expand_and_crop, resize_image)
+    #   Unchanged helper methods (create_black_starter, add_placeholder_text,
+    #   find_closest_ratio, expand_and_crop, resize_image)
     # ────────────────────────────────────────────────
+
     def create_black_starter(self, size=1024):
         h = w = size
         black = torch.zeros((1, h, w, 3), dtype=torch.float32)
         return black
+
     def add_placeholder_text(self, tensor, width, height):
         arr = (tensor.squeeze(0).cpu().numpy() * 255).round().astype(np.uint8)
         pil_img = Image.fromarray(arr)
@@ -246,6 +262,7 @@ class FossielResolutionWrangler:
         new_arr = np.array(pil_img).astype(np.float32) / 255.0
         new_tensor = torch.from_numpy(new_arr).unsqueeze(0)
         return new_tensor
+
     def find_closest_ratio(self, width, height, max_side=24):
         if width == 0 or height == 0:
             return 1, 1
@@ -301,6 +318,7 @@ class FossielResolutionWrangler:
                 else:
                     best_a, best_b = 3, 4
         return best_a, best_b
+
     def expand_and_crop(self, image, target_num, target_den, position, aspect_method):
         if len(image.shape) == 3:
             image = image.unsqueeze(0)
@@ -344,6 +362,7 @@ class FossielResolutionWrangler:
         if cropped_w != new_w or cropped_h != new_h:
             raise ValueError(f"Crop mismatch: expected {new_w}×{new_h}, got {cropped_w}×{cropped_h}")
         return cropped, cropped_w, cropped_h
+
     def resize_to_divisible(self, base_w, base_h, aspect_num, aspect_den, tolerance, pixel_cap):
         w = base_w
         h = base_h
@@ -361,6 +380,7 @@ class FossielResolutionWrangler:
                     max_w, max_h = w, h
                     max_pixels = current_pixels
         return max_w, max_h
+
     def resize_image(self, image, target_w, target_h, method="lanczos"):
         if len(image.shape) == 3:
             image = image.unsqueeze(0)

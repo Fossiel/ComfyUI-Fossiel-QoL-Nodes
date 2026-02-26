@@ -4,6 +4,7 @@ from .fccl import FossielCentralControlLite
 from .fcc_v2 import FossielCentralControl_v2
 from .lvl_m import FossielLevelMatcher
 from .resw import FossielResolutionWrangler
+from .reswxp import FossielResolutionWranglerXP
 from .seqw import FossielSequenceWrangler
 from .webpw import FossielWebPWrangler
 from .senswitch import (
@@ -23,6 +24,7 @@ NODE_CLASS_MAPPINGS = {
     "FossielDenoisePrecisionKSampler": FossielDenoisePrecisionKSampler,
     "FossielLevelMatcher": FossielLevelMatcher,
     "FossielResolutionWrangler": FossielResolutionWrangler,
+    "FossielResolutionWranglerXP": FossielResolutionWranglerXP,
     "Fossiel_Sensor_Switch_Image": FossielSensorSwitchImage,
     "Fossiel_Sensor_Switch_Clip": FossielSensorSwitchClip,
     "Fossiel_Sensor_Switch_Conditioning": FossielSensorSwitchConditioning,
@@ -42,6 +44,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FossielDenoisePrecisionKSampler": "Denoise Precision KSampler",
     "FossielLevelMatcher": "Image Level Matcher",
     "FossielResolutionWrangler": "Resolution Wrangler",
+    "FossielResolutionWranglerXP": "Resolution Wrangler (Express)",
     "Fossiel_Sensor_Switch_Image": "Sensor Switch Image",
     "Fossiel_Sensor_Switch_Clip": "Sensor Switch Clip",
     "Fossiel_Sensor_Switch_Conditioning": "Sensor Switch Conditioning",

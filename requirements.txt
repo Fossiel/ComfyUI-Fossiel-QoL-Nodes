@@ -1,3 +1,4 @@
 Pillow
 numpy
+num2words
 webp

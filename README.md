@@ -1,8 +1,16 @@
 # ComfyUI-Fossiel-QoL-Nodes
 
-ComfyUI-Fossiel-QoL-Nodes is (what will hopefully become) a suite of custom nodes for ComfyUI to improve quality of life. These nodes have been developed for personal use but maybe you’ll find them useful as well.
+ComfyUI-Fossiel-QoL-Nodes is a suite of custom nodes for ComfyUI to improve quality of life. These nodes have been developed for personal use but maybe you’ll find them useful as well.
 
 ## Nodes
+
+### Denoise Precision KSampler
+
+![SensorSwitches](images/dpks_ss.png)
+
+This node is an exact clone of the ComfyUI core KSampler with only one difference -> The Denoise parameter is represented as a percentage instead of a fraction. This effectively adds 2 decimal places to the value and allows for extremely precise settings.  
+
+---
 
 ### FossielCentralControl_v2
 
@@ -68,14 +76,6 @@ This node is your go-to hub for managing settings in ComfyUI. It simplifies crea
 
 ---
 
-### Denoise Precision KSampler
-
-![SensorSwitches](images/dpks_ss.png)
-
-This node is an exact clone of the ComfyUI core KSampler with only one difference -> The Denoise parameter is represented as a percentage instead of a fraction. This effectively adds 2 decimal places to the value and allows for extremely precise settings.  
-
----
-
 ### Image Level Matcher
 
 ![Image Level Matcher](images/lvlm_ss.png)
@@ -110,6 +110,14 @@ On the surface, it's yet another brightness and contrast adjuster. However, this
 
 **Outputs:**
 1. **IMAGE** – Adjusted image  
+
+---
+
+### Qwen Size Stabilizer (No Longer in this pack. Moved it to ComfyUI-Fossiel-QwenHelpers)
+
+![Qwen Size Stabilizer](images/qss_ss.png)
+
+If you've worked with Qwen Image Edit 2509 for any extended period of time, you will have probably experienced the unpredictability of the output when the resolution is set to a larger value than 1 megapixel (1024x1024). The Qwen Size Stabilizer node seeks to address this issue by allowing you to set an aspect ratio from a list of commonly used ones and the orientation of it. The resulting output is the exact chosen aspect ratio which is divisible by 2 and is as close as possible to the 1MP ceiling. Some aspects may exceed the 1MP threshold but by so little that the effect is neglegable.  
 
 ---
 
@@ -174,14 +182,6 @@ This is a set of 8 switches with a very special ability: Besides being able to f
 
 *Updated 2025/10/31*:  
 The Sensor Switch Latent now also supports the latent format for WAN 2.1 & 2.2
-
----
-
-### Qwen Size Stabilizer (No Longer in this pack. Moved it to ComfyUI-Fossiel-QwenHelpers)
-
-![Qwen Size Stabilizer](images/qss_ss.png)
-
-If you've worked with Qwen Image Edit 2509 for any extended period of time, you will have probably experienced the unpredictability of the output when the resolution is set to a larger value than 1 megapixel (1024x1024). The Qwen Size Stabilizer node seeks to address this issue by allowing you to set an aspect ratio from a list of commonly used ones and the orientation of it. The resulting output is the exact chosen aspect ratio which is divisible by 2 and is as close as possible to the 1MP ceiling. Some aspects may exceed the 1MP threshold but by so little that the effect is neglegable.  
 
 ---
 

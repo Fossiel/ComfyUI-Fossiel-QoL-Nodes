@@ -2,7 +2,7 @@
 
 ComfyUI-Fossiel-QoL-Nodes is a suite of custom nodes for ComfyUI to improve quality of life. These nodes have been developed for personal use but maybe you’ll find them useful as well.
 
-## Nodes
+## Nodes (Listed Alphabetically)
 
 ### Denoise Precision KSampler
 

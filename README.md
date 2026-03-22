@@ -220,6 +220,65 @@ This node allows you to load and manipulate image sequences, as though they were
 
 ---
 
+### SmolLM2 and SmolVLM2
+
+![Smol](images/svlm2_ss.png)
+
+If you've been watching with envy as YouTubers use the Qwen3 LLM and VLM models to automate prompting but your VRAM-poor system won't allow you to participate, then these nodes are what you've been looking for. These are clones from the [LayerStyle_Advance node pack by chflame163](https://github.com/chflame163/ComfyUI_LayerStyle_Advance). The nodes have been modified to add support for the SmolLM2 and SmolVLM2 family of models. These models are known for their extremely efficient inference and run remarkably well on very low VRAM (as low as 4GB).
+
+The SmolVLM2 model also supports video captioning but I have been unable to test that functionality because my 4GB VRAM isn't enough for analyzing video.    
+
+***Important:*** *The SmolVLM2 model has trouble analyzing images with a 1:1 aspect ratio. To analyze perfectly square images, first pad/crop them to a rectangular aspect ratio before sending them for inference.*  
+
+#### Supported Models
+
+Download the **entire repository contents** (excluding any ONNX files) from the links below and place them in `ComfyUI/models/smol/`, each in its own subfolder matching the repo name (e.g. `ComfyUI/models/smol/SmolVLM2-500M-Video-Instruct/`).
+
+| Model Name                          | Type          | Parameters | Hugging Face Link                                                                 | Notes / VRAM Recommendation                  |
+|-------------------------------------|---------------|------------|-----------------------------------------------------------------------------------|----------------------------------------------|
+| SmolLM2-135M-Instruct              | Text-only LLM | 135M      | [https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct) | Very lightweight, good for basic prompting   |
+| SmolLM2-360M-Instruct              | Text-only LLM | 360M      | [https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) | Balanced speed/quality                       |
+| SmolLM2-1.7B-Instruct              | Text-only LLM | 1.7B      | [https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct) | **Recommended** for low-VRAM prompt engineering (best coherence on 4GB+) |
+| SmolVLM-Instruct                   | Vision-LLM    | ~2B       | [https://huggingface.co/HuggingFaceTB/SmolVLM-Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM-Instruct) | Original SmolVLM (Gen1), image-only          |
+| SmolVLM2-256M-Video-Instruct       | Video-VLM     | 256M      | [https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-256M-Video-Instruct) | Smallest video-capable, very low VRAM        |
+| SmolVLM2-500M-Video-Instruct       | Video-VLM     | 500M      | [https://huggingface.co/HuggingFaceTB/SmolVLM2-500M-Video-Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-500M-Video-Instruct) | **Recommended** for low-VRAM (best balance for 4GB systems, supports image + multi-frame "video") |
+| SmolVLM2-2.2B-Instruct             | Video-VLM     | 2.2B      | [https://huggingface.co/HuggingFaceTB/SmolVLM2-2.2B-Instruct](https://huggingface.co/HuggingFaceTB/SmolVLM2-2.2B-Instruct) | Highest quality but VRAM-heavy               |
+
+#### Nodes Overview
+
+**Load SmolLM2 Model (Fossiel_QoL)**  
+Loads one of the SmolLM2-Instruct text models locally.  
+**Inputs:** model (dropdown), dtype (bf16/fp32), device (cuda/cpu).  
+**Outputs:** SmolLM2_MODEL (dict with tokenizer, model, dtype, device).  
+**Defaults:** Uses bf16 + cuda when possible for speed on low-VRAM GPUs.
+
+**Load SmolVLM / SmolVLM2 Model (Fossiel_QoL)**  
+Loads SmolVLM (Gen1) or SmolVLM2 (video-capable) models locally.  
+**Inputs:** model (dropdown including all SmolVLM2-Video-Instruct variants), dtype, device.  
+**Outputs:** SmolVLM_MODEL (dict with processor, model, dtype, device, family, model_name).  
+**Defaults:** SmolVLM2-500M-Video-Instruct + bf16 + cuda.
+
+**SmolLM2 (Fossiel_QoL)**  
+Performs pure text generation/inference with SmolLM2 (great for prompt expansion, JSON structuring, etc.).  
+**Inputs:** smolLM2_model, max_new_tokens (default 512), do_sample, temperature, top_p, system_prompt, user_prompt.  
+**Outputs:** text (STRING).  
+**Best for:** Turning short ideas into detailed image/video prompts.
+
+**SmolVLM (Gen1) (Fossiel_QoL)**  
+Image captioning/description using the original SmolVLM-Instruct (Gen1).  
+**Inputs:** image (single or batch), smolVLM_model, max_new_tokens (default 512), user_prompt.  
+**Outputs:** text (STRING, list if batch input).  
+**Note:** Use only with "family": "smolvlm" models.
+
+**SmolVLM2 (Fossiel_QoL)**  
+Advanced image (or multi-frame "video-like") captioning with SmolVLM2-Video-Instruct models.  
+**Inputs:** smolVLM_model, max_new_tokens (default 256 for VRAM safety), user_prompt, image (single or batch).  
+**Outputs:** text (STRING, list if batch input).  
+**Behavior:** If image batch size >1, treats frames as sequential (temporal context).  
+**Best for:** Describing single images or keyframe batches from videos on low VRAM.  
+
+---
+
 ### WebP Wrangler
 
 ![WebP Wrangler](images/webpw_ss.png)
@@ -269,6 +328,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/03/22 - Added nodes for SmolLM2 and SmolVLM2 prompt automation.  
 2026/02/26 - Added Resolution Wrangler (Express) node.  
 2026/02/26 - Added "Max Resolution x Ratio" option to Resolution Wrangler  
 2026/02/19 - Fixed null mask error and 1 to 1 resize bug in Resolution Wrangler  

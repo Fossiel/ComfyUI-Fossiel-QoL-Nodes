@@ -17,6 +17,13 @@ from .senswitch import (
     FossielSensorSwitchVAE,
     FossielSensorKSamplerSwitch
 )
+from .svlm2 import (
+    Fossiel_Load_SmolLM2_Model,
+    Fossiel_Load_SmolVLM_Model,
+    Fossiel_SmolLM2,
+    Fossiel_SmolVLM_Classic,
+    Fossiel_SmolVLM2,
+)
 
 NODE_CLASS_MAPPINGS = {
     "FossielCentralControlLite": FossielCentralControlLite,
@@ -34,6 +41,11 @@ NODE_CLASS_MAPPINGS = {
     "Fossiel_Sensor_Switch_VAE": FossielSensorSwitchVAE,
     "Fossiel_Sensor_KSampler_Switch": FossielSensorKSamplerSwitch,
     "FossielSequenceWrangler": FossielSequenceWrangler,
+    "Fossiel_LoadSmolLM2Model": Fossiel_Load_SmolLM2_Model,
+    "Fossiel_LoadSmolVLMModel": Fossiel_Load_SmolVLM_Model,
+    "Fossiel_SmolLM2": Fossiel_SmolLM2,
+    "Fossiel_SmolVLM_Classic": Fossiel_SmolVLM_Classic,
+    "Fossiel_SmolVLM2": Fossiel_SmolVLM2,
     "FossielVideoDeflicker": FossielVideoDeflicker,
     "FossielWebPWrangler": FossielWebPWrangler
 }
@@ -53,6 +65,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Fossiel_Sensor_Switch_Model": "Sensor Switch Model",
     "Fossiel_Sensor_Switch_VAE": "Sensor Switch VAE",
     "Fossiel_Sensor_KSampler_Switch": "Sensor KSampler Switch",
+    "Fossiel_LoadSmolLM2Model": "Load SmolLM2 Model (Fossiel_QoL)",
+    "Fossiel_LoadSmolVLMModel": "Load SmolVLM / SmolVLM2 Model (Fossiel_QoL)",
+    "Fossiel_SmolLM2": "SmolLM2 (Fossiel_QoL)",
+    "Fossiel_SmolVLM_Classic": "SmolVLM (Gen1) (Fossiel_QoL)",
+    "Fossiel_SmolVLM2": "SmolVLM2 (Fossiel_QoL)",
     "FossielSequenceWrangler": "Sequence Wrangler",
     "FossielVideoDeflicker": "Video De-flicker",
     "FossielWebPWrangler": "WebP Wrangler"

@@ -226,7 +226,9 @@ This node allows you to load and manipulate image sequences, as though they were
 
 If you've been watching with envy as YouTubers use the Qwen3 LLM and VLM models to automate prompting but your VRAM-poor system won't allow you to participate, then these nodes are what you've been looking for. These are clones from the [LayerStyle_Advance node pack by chflame163](https://github.com/chflame163/ComfyUI_LayerStyle_Advance). The nodes have been modified to add support for the SmolLM2 and SmolVLM2 family of models. These models are known for their extremely efficient inference and run remarkably well on very low VRAM (as low as 4GB).
 
-The SmolVLM2 model also supports video captioning but I have been unable to test that functionality because my 4GB VRAM isn't enough for analyzing video.    
+In addition to prompt-automation, SmolLM2 is also capable of ***writing lyrics for music generation with Ace-STEP 1.5*** and other music generators.
+
+The SmolVLM2 model also supports video captioning but I have been unable to test that functionality because my 4GB VRAM isn't enough for analyzing video.  
 
 ***Important:*** *The SmolVLM2 model has trouble analyzing images with a 1:1 aspect ratio. To analyze perfectly square images, first pad/crop them to a rectangular aspect ratio before sending them for inference.*  
 

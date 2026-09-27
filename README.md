@@ -12,6 +12,28 @@ This node is an exact clone of the ComfyUI core KSampler with only one differenc
 
 ---
 
+### Force Eager
+
+![Force Eager](images/fed_ss.png)
+
+Passthrough node that forces pure-PyTorch paths for Qwen 3.5 / TextGenerate by disabling the fused comfy-kitchen CUDA kernels that require a newer driver.
+
+Wire any value through this node before TextGenerate so it is guaranteed to run first. Does not alter the data and does not affect normal Qwen Image 2.1 image generation.
+
+#### Specifications
+
+**Inputs:**
+1. **anything** – Any type (passthrough).
+
+**Outputs:**
+1. **anything** – The same value, unchanged.
+
+**Notes:**
+- Applies the force-eager patch only once per session.
+- Useful when your NVIDIA driver is too old for the fused kernels used by Qwen 3.5 TextGenerate.
+
+---
+
 ### FossielCentralControl_v2
 
 ![FossielCentralControl_v2](images/fcc_v2_ss.png)
@@ -110,6 +132,125 @@ On the surface, it's yet another brightness and contrast adjuster. However, this
 
 **Outputs:**
 1. **IMAGE** – Adjusted image  
+
+---
+
+### Image Level Matcher Advanced
+
+![Image Level Matcher Advanced](images/lvl_ma_ss.png)
+
+Advanced version of Image Level Matcher. In addition to matching brightness, contrast and saturation from reference images (or applying manual offsets), this node supports an optional **Influence Map**. The influence map controls where the level adjustments are applied, allowing selective / masked correction while leaving other areas untouched.
+
+***Important:*** *When loading a batch of images, only the first frame will be used to match the levels in order to prevent flickering*  
+
+#### Specifications
+
+**Inputs:**
+1. **image** – The image to be adjusted (required)  
+2. **Brightness_Ref** – Reference image for brightness matching (optional)  
+3. **Contrast_Ref** – Reference image for contrast matching (optional)  
+4. **Saturation_Ref** – Reference image for saturation matching (optional)  
+5. **Influence_Map** – Optional grayscale / RGB image that controls the strength of the adjustment per pixel (optional)  
+
+**Parameters:**  
+1. **Match** – Choose what levels to match/adjust:  
+   - `All` *(default)* – Match/Adjust all parameters  
+   - `Brightness Only` – Match/Adjust only brightness  
+   - `Contrast Only` – Match/Adjust only contrast  
+   - `Saturation Only` – Match/Adjust only saturation  
+   - `Brightness & Contrast` – Match/Adjust brightness & contrast  
+   - `Brightness & Saturation` – Match/Adjust brightness & saturation  
+   - `Contrast & Saturation` – Match/Adjust contrast & saturation  
+2. **Brightness_offset** – Fine tune/Adjust brightness (-1.000–1.000).  
+3. **Contrast_offset** – Fine tune/Adjust contrast (-1.000–1.000).  
+4. **Saturation_offset** – Fine tune/Adjust saturation (-1.000–2.000).  
+5. **Saturation_algorithm** –  
+   - `Global` – Match based on the mean saturation level of the reference  
+   - `Midtone-Weighted` *(default)* – Match based on highlight / midtone / shadow saturation levels of the reference  
+6. **Use_Influence_Map** – Enable / disable the influence map (default: True).  
+7. **Invert_Influence_Map** – Invert the influence map so dark areas receive the adjustment instead of bright ones.  
+8. **Influence_Map_Strength** – Overall strength of the influence map (0.000–2.000). Values > 1.0 push the map toward full white.
+
+**Outputs:**
+1. **IMAGE** – Adjusted image  
+
+---
+
+### Inpaint Conditioning
+
+![Inpaint Conditioning](images/ipc_ss.png)
+
+Prepares positive / negative conditioning and a latent for inpainting. It encodes a masked version of the input image (pixels outside the mask are neutralised) and optionally injects a noise mask so sampling only occurs inside the masked region.
+
+You can supply an existing latent (e.g. from a previous stage) instead of re-encoding the original image.
+
+#### Specifications
+
+**Inputs:**
+1. **positive** – Positive conditioning  
+2. **negative** – Negative conditioning  
+3. **vae** – VAE used for encoding  
+4. **pixels** – Image to inpaint  
+5. **mask** – Inpaint mask  
+6. **latent** *(optional)* – Pre-existing latent; if omitted the original image is encoded  
+
+**Parameters:**
+1. **noise_mask** – Whether to attach a noise mask to the latent so sampling is restricted to the mask area (default: True).
+
+**Outputs:**
+1. **positive** – Conditioning with `concat_latent_image` + `concat_mask` set  
+2. **negative** – Conditioning with `concat_latent_image` + `concat_mask` set  
+3. **latent** – Latent ready for sampling (optionally with noise_mask)
+
+---
+
+### Latent I/O
+
+![Latent I/O](images/lio_ss.png)
+
+A small family of three nodes for saving, loading and pre-validating `.latent` files.
+
+**Fossiel Save Latent**  
+Saves a latent tensor to a user-specified directory + filename (auto-appends `.latent` if missing). Supports overwrite control and optional workflow metadata.
+
+**Fossiel Load Latent**  
+Loads a `.latent` file from a full path. Automatically applies the historic SD 1.x scale factor when the file lacks the modern format marker.
+
+**Fossiel Latent Listener**  
+Early-validation guard. Performs the same path / filename checks as Save Latent (without the overwrite option). Place it before a KSampler (or any early node) so the workflow aborts cleanly if the target file already exists or the path is invalid. Passes the input through unchanged when everything is fine.
+
+#### Specifications (Save Latent)
+
+**Inputs:**
+1. **samples** – Latent to save  
+
+**Parameters:**
+1. **output_path** – Directory path (must be a folder, not a file)  
+2. **filename** – Filename only (no path separators)  
+3. **overwrite** – Allow overwriting an existing file (default: False)
+
+**Outputs:**
+1. **samples** – The same latent (passthrough)
+
+#### Specifications (Load Latent)
+
+**Parameters:**
+1. **full_path** – Complete path including filename (e.g. `/path/to/file.latent`)
+
+**Outputs:**
+1. **LATENT** – Loaded latent tensor
+
+#### Specifications (Latent Listener)
+
+**Inputs:**
+1. **anything** – Any type (passthrough)
+
+**Parameters:**
+1. **output_path** – Directory that will be used later by Save Latent  
+2. **filename** – Filename that will be used later by Save Latent  
+
+**Outputs:**
+1. **anything** – The same value, unchanged (or raises a clear error)
 
 ---
 
@@ -281,6 +422,76 @@ Advanced image (or multi-frame "video-like") captioning with SmolVLM2-Video-Inst
 
 ---
 
+### Time Formatter
+
+![Time Formatter](images/tfmt_ss.png)
+
+Converts between frame counts and time (seconds) and formats the result in a variety of human-readable or filename-friendly styles.
+
+You may feed **either** a frame count **or** a time-in-seconds value (not both). The node then produces two string outputs: a display-oriented formatted time and a colon-free version safe for filenames.
+
+#### Specifications
+
+**Optional Inputs:**
+1. **Frames** – Integer frame count  
+2. **Time_sec** – Floating-point time in seconds  
+
+**Parameters:**
+1. **Frames_per_sec** – Frame rate used for the conversion (default: 16)  
+2. **Time_format** – Desired output style:  
+   - `Frames`  
+   - `Time (sec)`  
+   - `HH:MM:SS:FF`  
+   - `HH:MM:SS:msec`  
+   - `HH:MM:SS`  
+   - `Total Seconds`  
+   - `Total Frames`
+
+**Outputs:**
+1. **Formatted_Time_(str)** – Human-readable time string  
+2. **Filename_Friendly** – Same value with `:` replaced by `-` (for time formats) so it can be used safely in filenames
+
+**Notes:**
+- Providing both Frames and Time_sec raises a clear error.  
+- When the selected format matches the supplied input type the value is passed through with minimal reformatting.
+
+---
+
+### Unified Inpaint Sampler
+
+![Unified Inpaint Sampler](images/uips_ss.png)
+
+All-in-one advanced inpaint sampler. It performs inpaint conditioning, optional differential diffusion, sampling, and (optionally) tiled VAE decoding in a single node.
+
+Denoise is expressed as a percentage (0.01–100.00) for fine control. Differential diffusion and a noise mask can be enabled independently. When VAE tiling is turned on, the decode stage is split into overlapping tiles with smooth blending, which is useful for large images or video latents.
+
+#### Specifications
+
+**Inputs:**
+1. **model** – Diffusion model  
+2. **positive** / **negative** – Conditioning  
+3. **vae** – VAE for encode / decode  
+4. **image** – Image to inpaint  
+5. **mask** – Inpaint mask  
+6. **latent** *(optional)* – Pre-existing latent (otherwise the image is encoded)
+
+**Parameters:**
+1. **seed**, **steps**, **cfg**, **sampler_name**, **scheduler** – Standard sampling controls  
+2. **denoise** – Denoise strength as a percentage (default 100.00)  
+3. **noise_mask** – Restrict sampling to the mask area (default: True)  
+4. **use_differential_diffusion** – Enable differential diffusion (default: True)  
+5. **differential_strength** – Strength of the differential diffusion effect (0.0–1.0)  
+6. **enable_vae_tiling** – Use tiled VAE decode (default: True)  
+7. **horizontal_tiles** / **vertical_tiles** – Tile grid size  
+8. **overlap** – Overlap between tiles (in latent pixels)  
+9. **last_frame_fix** – For video latents, duplicate the last frame before tiling (helps some VAEs)
+
+**Outputs:**
+1. **image** – Decoded result  
+2. **latent** – Denoised latent (before decode)
+
+---
+
 ### WebP Wrangler
 
 ![WebP Wrangler](images/webpw_ss.png)
@@ -330,6 +541,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/09/27 - Added Force Eager, Inpaint Conditioning, Latent I/O (Save / Load / Listener), Image Level Matcher Advanced, Time Formatter and Unified Inpaint Sampler nodes.  
 2026/03/22 - Added nodes for SmolLM2 and SmolVLM2 prompt automation.  
 2026/02/26 - Added Resolution Wrangler (Express) node.  
 2026/02/26 - Added "Max Resolution x Ratio" option to Resolution Wrangler  
@@ -358,6 +570,4 @@ This node allows you to load and use animated WebP files, as though they were pr
 ## Credits  
 Developed with help from Grok3  
 All the developers who make tools available to everyone using local AI  
-Model developers for supplying fantastic open source models, free of charge.  
-
-
+Model developers for supplying fantastic open source models, free of charge.

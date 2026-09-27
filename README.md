@@ -12,7 +12,7 @@ This node is an exact clone of the ComfyUI core KSampler with only one differenc
 
 ---
 
-### Force Eager
+### Force Eager DeltaNet
 
 ![Force Eager](images/fed_ss.png)
 
@@ -135,7 +135,7 @@ On the surface, it's yet another brightness and contrast adjuster. However, this
 
 ---
 
-### Image Level Matcher Advanced
+### Image Level Matcher (Advanced)
 
 ![Image Level Matcher Advanced](images/lvl_ma_ss.png)
 
@@ -176,11 +176,11 @@ Advanced version of Image Level Matcher. In addition to matching brightness, con
 
 ---
 
-### Inpaint Conditioning
+### Latent Passthrough Inpaint Conditioning
 
 ![Inpaint Conditioning](images/ipc_ss.png)
 
-Prepares positive / negative conditioning and a latent for inpainting. It encodes a masked version of the input image (pixels outside the mask are neutralised) and optionally injects a noise mask so sampling only occurs inside the masked region.
+Based on the ComfyUI core node. Prepares positive / negative conditioning and a latent for inpainting. It encodes a masked version of the input image (pixels outside the mask are neutralised) and optionally injects a noise mask so sampling only occurs inside the masked region.
 
 You can supply an existing latent (e.g. from a previous stage) instead of re-encoding the original image.
 
@@ -457,7 +457,7 @@ You may feed **either** a frame count **or** a time-in-seconds value (not both).
 
 ---
 
-### Unified Inpaint Sampler
+### Unified Inpaint Sampler v2
 
 ![Unified Inpaint Sampler](images/uips_ss.png)
 
@@ -541,6 +541,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/09/27 - Bug fixes to Resolution Wrangler.  
 2026/09/27 - Added Force Eager, Inpaint Conditioning, Latent I/O (Save / Load / Listener), Image Level Matcher Advanced, Time Formatter and Unified Inpaint Sampler nodes.  
 2026/03/22 - Added nodes for SmolLM2 and SmolVLM2 prompt automation.  
 2026/02/26 - Added Resolution Wrangler (Express) node.  

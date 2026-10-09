@@ -561,6 +561,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/10/10 - Added Pixel Budgeting node.  
 2026/09/27 - Bug fixes to Resolution Wrangler.  
 2026/09/27 - Added Force Eager, Inpaint Conditioning, Latent I/O (Save / Load / Listener), Image Level Matcher Advanced, Time Formatter and Unified Inpaint Sampler nodes.  
 2026/03/22 - Added nodes for SmolLM2 and SmolVLM2 prompt automation.  

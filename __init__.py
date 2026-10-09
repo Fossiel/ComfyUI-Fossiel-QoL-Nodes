@@ -2,10 +2,18 @@ from .deflicker import FossielVideoDeflicker
 from .dpks import FossielDenoisePrecisionKSampler
 from .fccl import FossielCentralControlLite
 from .fcc_v2 import FossielCentralControl_v2
+from .fed import FossielForceEager
+from .ipc import FossielInpaintConditioning
+from .lio import FossielSaveLatent, FossielLoadLatent, FossielLatentListener
 from .lvl_m import FossielLevelMatcher
+from .lvl_ma import FossielLevelMatcherAdvanced
+from .pb import FossielPixelBudget
 from .resw import FossielResolutionWrangler
 from .reswxp import FossielResolutionWranglerXP
 from .seqw import FossielSequenceWrangler
+from .si import FossielSolidifyImage
+from .tfmt import FossielTimeFormatter
+from .uips import FossielUnifiedInpaintSampler
 from .webpw import FossielWebPWrangler
 from .senswitch import (
     FossielSensorSwitchImage,
@@ -29,7 +37,14 @@ NODE_CLASS_MAPPINGS = {
     "FossielCentralControlLite": FossielCentralControlLite,
     "FossielCentralControl_v2": FossielCentralControl_v2,
     "FossielDenoisePrecisionKSampler": FossielDenoisePrecisionKSampler,
+    "FossielForceEager": FossielForceEager,
+    "FossielInpaintConditioning": FossielInpaintConditioning,
+    "FossielLatentListener": FossielLatentListener,
+    "FossielLoadLatent": FossielLoadLatent,
+    "FossielSaveLatent": FossielSaveLatent,
     "FossielLevelMatcher": FossielLevelMatcher,
+    "FossielLevelMatcherAdvanced": FossielLevelMatcherAdvanced,
+    "FossielPixelBudget": FossielPixelBudget,
     "FossielResolutionWrangler": FossielResolutionWrangler,
     "FossielResolutionWranglerXP": FossielResolutionWranglerXP,
     "Fossiel_Sensor_Switch_Image": FossielSensorSwitchImage,
@@ -46,6 +61,9 @@ NODE_CLASS_MAPPINGS = {
     "Fossiel_SmolLM2": Fossiel_SmolLM2,
     "Fossiel_SmolVLM_Classic": Fossiel_SmolVLM_Classic,
     "Fossiel_SmolVLM2": Fossiel_SmolVLM2,
+    "FossielSolidifyImage": FossielSolidifyImage,
+    "FossielTimeFormatter": FossielTimeFormatter,
+    "FossielUnifiedInpaintSampler": FossielUnifiedInpaintSampler,
     "FossielVideoDeflicker": FossielVideoDeflicker,
     "FossielWebPWrangler": FossielWebPWrangler
 }
@@ -54,7 +72,14 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FossielCentralControlLite": "Fossiel Central Control Lite",
     "FossielCentralControl_v2": "Fossiel Central Control v2",
     "FossielDenoisePrecisionKSampler": "Denoise Precision KSampler",
+    "FossielForceEager": "Force Eager DeltaNet",
+    "FossielInpaintConditioning": "Latent Passthrough Inpaint Conditioning",
+    "FossielLatentListener": "Latent Listener",
+    "FossielLoadLatent": "Load Latent from Path",
+    "FossielSaveLatent": "Save Latent to Path",
     "FossielLevelMatcher": "Image Level Matcher",
+    "FossielLevelMatcherAdvanced": "Image Level Matcher (Advanced)",
+    "FossielPixelBudget": "Pixel Budgeting",
     "FossielResolutionWrangler": "Resolution Wrangler",
     "FossielResolutionWranglerXP": "Resolution Wrangler (Express)",
     "Fossiel_Sensor_Switch_Image": "Sensor Switch Image",
@@ -70,6 +95,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Fossiel_SmolLM2": "SmolLM2 (Fossiel_QoL)",
     "Fossiel_SmolVLM_Classic": "SmolVLM (Gen1) (Fossiel_QoL)",
     "Fossiel_SmolVLM2": "SmolVLM2 (Fossiel_QoL)",
+    "FossielSolidifyImage": "Solidify Image",
+    "FossielTimeFormatter": "Time Formatter",
+    "FossielUnifiedInpaintSampler": "Unified Inpaint Sampler v2",
     "FossielSequenceWrangler": "Sequence Wrangler",
     "FossielVideoDeflicker": "Video De-flicker",
     "FossielWebPWrangler": "WebP Wrangler"

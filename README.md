@@ -210,13 +210,13 @@ You can supply an existing latent (e.g. from a previous stage) instead of re-enc
 
 A small family of three nodes for saving, loading and pre-validating `.latent` files.
 
-**Fossiel Save Latent**  
+**Save Latent**  
 Saves a latent tensor to a user-specified directory + filename (auto-appends `.latent` if missing). Supports overwrite control and optional workflow metadata.
 
-**Fossiel Load Latent**  
+**Load Latent**  
 Loads a `.latent` file from a full path. Automatically applies the historic SD 1.x scale factor when the file lacks the modern format marker.
 
-**Fossiel Latent Listener**  
+**Latent Listener**  
 Early-validation guard. Performs the same path / filename checks as Save Latent (without the overwrite option). Place it before a KSampler (or any early node) so the workflow aborts cleanly if the target file already exists or the path is invalid. Passes the input through unchanged when everything is fine.
 
 #### Specifications (Save Latent)
@@ -251,6 +251,26 @@ Early-validation guard. Performs the same path / filename checks as Save Latent 
 
 **Outputs:**
 1. **anything** – The same value, unchanged (or raises a clear error)
+
+---
+
+### Pixel Budgeting
+
+![Pixel Budgeting](images/pb_ss.png)
+
+This is a simple math node which was specifically designed to help overcome OOMs in low VRAM video workflows. The node allows a total pixel budget and frame count to be set for a video clip. Based on the budget and the frame count, it then outputs the maximum square resolution. When used in combination with the Resolution Wrangler node from this pack, a clip of any aspect ratio can be generated while fitting within the total pixel budget for the clip.  
+
+#### Specifications
+
+**Parameters:**
+1. **Pixel_budget** – The total number of pixels available for a video clip. E.g. to generate a clip of 81 frames at a frame size of 1024x1024, would require a budget of 81 x (1024 x 1024) = 84934656  
+2. **Frame_count** – The length of the video in frames.  
+3. **Round** – The direction of integer rounding.  
+4. **Force_Video_Compatibility** - When set to true, the output frame count will snap to the next multiple of 4 + 1. E.g. when Frame_count is set to 79, the output count will snap to 81.  
+
+**Outputs:**
+1. **Max_Resolution** – The maximum side-length of the square frame which fits inside the pixel budget at the current frame count.  
+2. **Frame_Count** – Passes the value of Frame_count and optionally snaps to the next compatible count.  
 
 ---
 

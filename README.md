@@ -109,7 +109,7 @@ A clone of the ComfyUI native Generate Text node with the exception that this no
 **Optional Inputs** *(Only additional to the Comfy-core node)*
 
 1. **image0** – Renamed from "image"  
-2. **image1..image9** – Added input ports  
+2. **image1..image7** – Added input ports  
 
 ---
 

@@ -13,6 +13,7 @@ from .reswxp import FossielResolutionWranglerXP
 from .seqw import FossielSequenceWrangler
 from .si import FossielSolidifyImage
 from .tfmt import FossielTimeFormatter
+from .tg import FossielTextGenerate
 from .uips import FossielUnifiedInpaintSampler
 from .webpw import FossielWebPWrangler
 from .senswitch import (
@@ -62,6 +63,7 @@ NODE_CLASS_MAPPINGS = {
     "Fossiel_SmolVLM_Classic": Fossiel_SmolVLM_Classic,
     "Fossiel_SmolVLM2": Fossiel_SmolVLM2,
     "FossielSolidifyImage": FossielSolidifyImage,
+    "FossielTextGenerate": FossielTextGenerate,
     "FossielTimeFormatter": FossielTimeFormatter,
     "FossielUnifiedInpaintSampler": FossielUnifiedInpaintSampler,
     "FossielVideoDeflicker": FossielVideoDeflicker,
@@ -96,6 +98,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Fossiel_SmolVLM_Classic": "SmolVLM (Gen1) (Fossiel_QoL)",
     "Fossiel_SmolVLM2": "SmolVLM2 (Fossiel_QoL)",
     "FossielSolidifyImage": "Solidify Image",
+    "FossielTextGenerate": "Generate Text (Expanded)",
     "FossielTimeFormatter": "Time Formatter",
     "FossielUnifiedInpaintSampler": "Unified Inpaint Sampler v2",
     "FossielSequenceWrangler": "Sequence Wrangler",

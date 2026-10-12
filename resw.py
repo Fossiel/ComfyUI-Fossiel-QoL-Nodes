@@ -403,41 +403,48 @@ class FossielResolutionWrangler:
         return cropped, cropped_w, cropped_h
 
     def resize_to_divisible(self, base_w, base_h, aspect_num, aspect_den, tolerance, pixel_cap):
-        # === SPECIAL CASE FOR 1:1 (Perfect Square) ===
-        if aspect_num == 1 and aspect_den == 1:
-            # Start from the largest possible square under the pixel cap
+        """
+        Largest (w, h) with exact aspect aspect_num:aspect_den,
+        both sides divisible by tolerance, and w*h <= pixel_cap.
+        """
+        aspect_num = max(1, int(aspect_num))
+        aspect_den = max(1, int(aspect_den))
+        tolerance = max(1, int(tolerance))
+        pixel_cap = max(1, int(pixel_cap))
+
+        # --- 1:1 ---
+        if aspect_num == aspect_den:
             max_side = int(math.sqrt(pixel_cap))
-            
-            # Step backwards until we find a size divisible by tolerance
             for side in range(max_side, 0, -1):
-                if side % tolerance == 0:
-                    # Double check it actually fits
-                    if side * side <= pixel_cap:
-                        return side, side
-                    # If it doesn't fit, continue stepping down
-        
-            # Fallback (should almost never hit)
+                if side % tolerance == 0 and side * side <= pixel_cap:
+                    return side, side
             return tolerance, tolerance
 
-        # === ORIGINAL CODE FOR NON-1:1 RATIOS (unchanged) ===
-        w = base_w
-        h = base_h
-        max_w, max_h = w, h
-        max_pixels = w * h
+        g = math.gcd(aspect_num, aspect_den)
+        aspect_num //= g
+        aspect_den //= g
 
-        while True:
-            next_w = w + aspect_num
-            next_h = h + aspect_den
-            if next_w * next_h > pixel_cap:
-                break
-            w, h = next_w, next_h
-            if w % tolerance == 0 and h % tolerance == 0:
-                current_pixels = w * h
-                if current_pixels > max_pixels:
-                    max_w, max_h = w, h
-                    max_pixels = current_pixels
+        # k such that (k*an) % tol == 0 and (k*ad) % tol == 0
+        step_w = tolerance // math.gcd(aspect_num, tolerance)
+        step_h = tolerance // math.gcd(aspect_den, tolerance)
+        k_step = math.lcm(step_w, step_h)  # or abs(a*b)//gcd on older Python
 
-        return max_w, max_h
+        min_w = aspect_num * k_step
+        min_h = aspect_den * k_step
+
+        # Upper bound from pixel budget only (do NOT clamp to base)
+        max_k = int(math.sqrt(pixel_cap / (aspect_num * aspect_den)))
+        max_k = (max_k // k_step) * k_step
+        if max_k < k_step:
+            max_k = k_step
+
+        for k in range(max_k, 0, -k_step):
+            w = k * aspect_num
+            h = k * aspect_den
+            if w * h <= pixel_cap:
+                return w, h
+
+        return min_w, min_h
 
     def resize_image(self, image, target_w, target_h, method="lanczos"):
         if len(image.shape) == 3:

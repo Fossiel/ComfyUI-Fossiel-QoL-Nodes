@@ -98,6 +98,21 @@ This node is your go-to hub for managing settings in ComfyUI. It simplifies crea
 
 ---
 
+### Generate Text (Expanded)
+
+![Generate Text (Expanded)](images/tg_ss.png)
+
+A clone of the ComfyUI native Generate Text node with the exception that this node supports multiple images without having to batch them.
+
+#### Specifications
+
+**Optional Inputs** *(Only additional to the Comfy-core node)*
+
+1. **image0** – Renamed from "image"  
+2. **image1..image9** – Added input ports  
+
+---
+
 ### Image Level Matcher
 
 ![Image Level Matcher](images/lvlm_ss.png)
@@ -485,6 +500,8 @@ All-in-one advanced inpaint sampler. It performs inpaint conditioning, optional 
 
 Denoise is expressed as a percentage (0.01–100.00) for fine control. Differential diffusion and a noise mask can be enabled independently. When VAE tiling is turned on, the decode stage is split into overlapping tiles with smooth blending, which is useful for large images or video latents.
 
+Utilizes the tiler code from [ComfyUI-TiledVAELite](https://github.com/hum-ma/ComfyUI-TiledVaeLite)
+
 #### Specifications
 
 **Inputs:**
@@ -561,6 +578,8 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/10/12 - Bug Fixes in Resolution Wrangler  
+2026/10/12 - Added Text Generate (Expanded) node  
 2026/10/10 - Added Pixel Budgeting node.  
 2026/09/27 - Bug fixes to Resolution Wrangler.  
 2026/09/27 - Added Force Eager, Inpaint Conditioning, Latent I/O (Save / Load / Listener), Image Level Matcher Advanced, Time Formatter and Unified Inpaint Sampler nodes.  

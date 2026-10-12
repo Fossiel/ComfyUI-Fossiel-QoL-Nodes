@@ -7,6 +7,19 @@ from comfy.cli_args import args
 import hashlib
 import safetensors.torch
 
+# Try to import NestedTensor (available in recent ComfyUI)
+try:
+    from comfy.nested_tensor import NestedTensor
+    HAS_NESTED = True
+except ImportError:
+    HAS_NESTED = False
+    NestedTensor = None
+
+
+def _is_nested_tensor(obj):
+    return HAS_NESTED and isinstance(obj, NestedTensor)
+
+
 class FossielSaveLatent:
     SEARCH_ALIASES = ["export latent"]
 
@@ -75,9 +88,26 @@ class FossielSaveLatent:
                 for x in extra_pnginfo:
                     metadata[x] = json.dumps(extra_pnginfo[x])
 
+        # ---------- handle NestedTensor (MiniMax H3) vs normal tensor ----------
+        samples_tensor = samples["samples"]
+
         output = {}
-        output["latent_tensor"] = samples["samples"].contiguous()
-        output["latent_format_version_0"] = torch.tensor([])
+
+        if _is_nested_tensor(samples_tensor):
+            # MiniMax H3 AV latent
+            # NestedTensor.tensors is a tuple/list of the component tensors
+            video_lat, audio_lat = samples_tensor.tensors
+
+            output["latent_type"] = torch.tensor([1])          # 1 = nested / minimax
+            output["video_latent"] = video_lat.contiguous().cpu()
+            output["audio_latent"] = audio_lat.contiguous().cpu()
+            # keep a marker so loaders know the format
+            output["latent_format_version_0"] = torch.tensor([])
+        else:
+            # Classic single-tensor latent
+            output["latent_type"] = torch.tensor([0])          # 0 = normal
+            output["latent_tensor"] = samples_tensor.contiguous().cpu()
+            output["latent_format_version_0"] = torch.tensor([])
 
         comfy.utils.save_torch_file(output, full_path, metadata=metadata)
 
@@ -107,7 +137,7 @@ class FossielLoadLatent:
 
     def load(self, full_path):
         if not full_path or full_path.strip() == "":
-            raise ValueError("FossielLoadLatent: full_path is empty. Please provide a complete path and filename (e.g. /path/to/file.latent).")
+            raise ValueError("FossielLoadLatent: full_path is empty. Please provide a complete path and filename.")
 
         full_path = full_path.strip()
 
@@ -115,10 +145,29 @@ class FossielLoadLatent:
             raise ValueError(f"FossielLoadLatent: File not found: {full_path}")
 
         latent = safetensors.torch.load_file(full_path, device="cpu")
-        multiplier = 1.0
-        if "latent_format_version_0" not in latent:
-            multiplier = 1.0 / 0.18215
-        samples = {"samples": latent["latent_tensor"].float() * multiplier}
+
+        # ---------- detect format ----------
+        if "latent_type" in latent and int(latent["latent_type"].item()) == 1:
+            # MiniMax H3 NestedTensor format
+            if not HAS_NESTED:
+                raise RuntimeError(
+                    "FossielLoadLatent: This file contains a MiniMax H3 NestedTensor latent, "
+                    "but your ComfyUI version does not have comfy.nested_tensor.NestedTensor."
+                )
+
+            video = latent["video_latent"].float()
+            audio = latent["audio_latent"].float()
+            nested = NestedTensor([video, audio])
+            samples = {"samples": nested}
+
+        else:
+            # Classic format (or old files without latent_type)
+            multiplier = 1.0
+            if "latent_format_version_0" not in latent:
+                multiplier = 1.0 / 0.18215
+
+            samples = {"samples": latent["latent_tensor"].float() * multiplier}
+
         return (samples,)
 
     @classmethod
@@ -136,7 +185,7 @@ class FossielLoadLatent:
     @classmethod
     def VALIDATE_INPUTS(s, full_path):
         if not full_path or full_path.strip() == "":
-            return "full_path is empty. Please provide a complete path and filename (e.g. /path/to/file.latent)."
+            return "full_path is empty. Please provide a complete path and filename."
         full_path = full_path.strip()
         if not os.path.isfile(full_path):
             return f"File not found: {full_path}"

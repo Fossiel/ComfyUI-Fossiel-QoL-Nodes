@@ -225,6 +225,8 @@ You can supply an existing latent (e.g. from a previous stage) instead of re-enc
 
 A small family of three nodes for saving, loading and pre-validating `.latent` files.
 
+*Support for MiniMax H3 nested latents (video + audio) added on 2026/10/12*
+
 **Save Latent**  
 Saves a latent tensor to a user-specified directory + filename (auto-appends `.latent` if missing). Supports overwrite control and optional workflow metadata.
 
@@ -578,6 +580,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/10/12 - Added support for MiniMax H3 latents to the Latent IO nodes.  
 2026/10/12 - Bug Fixes in Resolution Wrangler  
 2026/10/12 - Added Text Generate (Expanded) node  
 2026/10/10 - Added Pixel Budgeting node.  

@@ -283,7 +283,8 @@ This is a simple math node which was specifically designed to help overcome OOMs
 1. **Pixel_budget** – The total number of pixels available for a video clip. E.g. to generate a clip of 81 frames at a frame size of 1024x1024, would require a budget of 81 x (1024 x 1024) = 84934656  
 2. **Frame_count** – The length of the video in frames.  
 3. **Round** – The direction of integer rounding.  
-4. **Force_Video_Compatibility** - When set to true, the output frame count will snap to the next multiple of 4 + 1. E.g. when Frame_count is set to 79, the output count will snap to 81.  
+4. **Force_Video_Compatibility** - When set to true, the output frame count will snap to the next multiple determined by the Video_format selector. E.g. when Frame_count is set to 79, the output count will snap to 81 for the Wan video model family.  
+5. **Video Format** - Determines the frame count snapping behavior when Force_Video_Compatibility is enabled and is ignored when the latter is disabled.
 
 **Outputs:**
 1. **Max_Resolution** – The maximum side-length of the square frame which fits inside the pixel budget at the current frame count.  
@@ -580,6 +581,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
+2026/10/15 - Added video model selector in Pixel Budgeting node.
 2026/10/12 - Added support for MiniMax H3 latents to the Latent IO nodes.  
 2026/10/12 - Bug Fixes in Resolution Wrangler  
 2026/10/12 - Added Text Generate (Expanded) node  

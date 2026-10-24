@@ -4,6 +4,54 @@ ComfyUI-Fossiel-QoL-Nodes is a suite of custom nodes for ComfyUI to improve qual
 
 ## Nodes (Listed Alphabetically)
 
+### Add Silence to Audio
+
+![Add Silence to Audio](images/aas_ss.png)
+
+Adds a configurable duration of silence to the start, end, or both ends of an audio clip. Useful for padding audio before/after generation or aligning audio with video timelines.
+
+#### Specifications
+
+**Inputs:**
+1. **audio** – Audio dictionary (waveform + sample_rate)
+
+**Parameters:**
+1. **Silence_duration** – Length of silence in seconds (0.0–60.0, default 0.5)
+2. **Add_silence_at** – Where to insert the silence: `Start`, `End`, or `Both`
+
+**Outputs:**
+1. **audio** – Modified audio with silence added
+
+---
+
+### Color Match (Passthrough Ports)
+
+![Color Match](images/cm_ss.png)
+
+Color transfer / matching node based on the excellent ColorMatch implementation by **Kijai** (from [ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes)).
+
+The only change is the port order: `image_target` is the top input so that when the node is bypassed, ComfyUI correctly passes the target image through instead of the reference.
+
+Supports multiple transfer methods (mkl, hm, reinhard, mvgd, and compound variants) with optional strength and multithreading.
+
+#### Specifications
+
+**Inputs:**
+1. **image_target** – Image to be color-matched (top port for correct bypass behaviour)
+2. **image_ref** – Reference image whose colors will be transferred
+
+**Parameters:**
+1. **method** – Color transfer algorithm (`mkl` default)
+2. **strength** – Blend strength of the matched result (0.0–10.0, default 1.0)
+3. **multithread** – Enable multi-threaded processing for batches (default True)
+
+**Outputs:**
+1. **image** – Color-matched result
+
+**Credits:** Original ColorMatch node by Kijai. Modified only for port ordering.
+
+---
+
 ### Denoise Precision KSampler
 
 ![SensorSwitches](images/dpks_ss.png)
@@ -34,67 +82,45 @@ Wire any value through this node before TextGenerate so it is guaranteed to run 
 
 ---
 
-### FossielCentralControl_v2
+### FossielCentralControl_v3
 
-![FossielCentralControl_v2](images/fcc_v2_ss.png)
+![FossielCentralControl_v3](images/fcc_v3_ss.png)
 
 This node is your go-to hub for managing settings in ComfyUI. It simplifies creating video clips in multiple consecutive runs (like extending a sequence) but it's versatile enough to work great for any ComfyUI project, keeping things organized and easy.
 
+**Note:** FossielCentralControl_v2 remains available for backwards compatibility with existing workflows.
+
 #### Specifications
 
-**Inputs:**
-1. **Images (optional)** – Accepts a single image or a batch of images. It grabs the batch size (how many images) and the resolution (width and height) of the first image. The batch size goes to the `batch_count` output, and the resolution is used to set the target dimensions for video or image generation, overriding the Resolution Target setting if connected.
-
 **Parameters:**
-1. **Resolution Settings** – Controls the size of your output image or video.  
-   - *Manual Resolution*: Set your preferred width and height (e.g., 512x512). These go straight to the `Manual Resolution` output for use in other nodes.  
-   - *Resolution Target*: Define the ideal width and height for your project (e.g., 512x512). If an image is connected to the Images input, its dimensions take over. The node calculates a final resolution that matches this aspect ratio as closely as possible, stays within a maximum pixel limit (set by Maximum Resolution), and aligns with a tolerance value for better AI compatibility. Lower tolerance values give a more accurate aspect ratio, while higher ones work better with the AI’s internal math.  
-   - *Maximum Resolution*: Caps the width and height to keep the total pixels manageable. The calculated resolution is sent to the `Calculated Resolution` output.  
-   - *Note*: If calculations go wonky (e.g., zero height), it defaults to 64x64 to keep things safe.  
-2. **Video Settings** – Manages video-specific options for smooth generation.  
-   - *Video Length*: Sets the number of frames (e.g., 81). It snaps to 1 or multiples of 4 + 1 (like 5, 9, 13) for compatibility and goes to the `Vid_Length` output.  
-   - *Overlap Length*: Sets how many frames overlap between video segments (e.g., 8), sent to the `Overlap` output.  
-   - *Frame Rate*: Defines frames per second (e.g., 16.0), sent to the `Frame_Rate` output.  
-   - *Start/End Frames*: Based on Video Length and Current Generation (e.g., which clip you’re making, like clip 1 or 2), it calculates the first and last frame numbers, sent to `Start_Index` and `End_Index`. It also computes their timings (in seconds) for `Start_Time` and `End_Time`.  
-   - *First Generation Switch*: Outputs a yes/no signal (1 for the first clip, 0 for others) to tweak setups for the first video clip differently, sent to `First_Gen_Batch_Switch`.  
-3. **Sampling and Naming Settings** – Handles AI generation and file naming.  
-   - *Sampling Steps*: Sets the number of AI processing steps (snaps to even numbers, e.g., 4). It splits these steps for two samplers in workflows, using a split method (repeat last step or move to next) and a ratio (e.g., 50/50). These go to `steps`, `KSampler_1_End_Step`, and `KSampler_2_Start_Step`.  
-   - *CFG Scale*: Controls how closely the AI follows your prompt (e.g., 7.0), sent to the `cfg` output.  
-   - *Sampler and Scheduler*: Chooses the AI’s processing style (e.g., “euler” sampler, “simple” scheduler), sent to `Sampler` and `Scheduler`.  
-   - *File Naming*:  
-     - **Project Name** – Base project identifier (e.g., `MyProject`).  
-     - **Scene Name** – Specific scene or clip name (e.g., `Intro`).  
-     - **Naming Suffix** – Choose `None` or `Current Gen` to append `Gen001`, `Gen002`, etc.  
-     - **Delimiter** – Separator between parts (default `_`).  
-     - The final name combines non-empty parts: `Project_Delimiter_Scene` or `Project_Delimiter_Gen001`, etc. Empty fields are skipped — no double delimiters. Output goes to `File_Name`, generation number to `Gen_Num`.  
+1. **Resolution Settings** – Two independent resolution pairs (Width/Height 1 and 2) that are passed straight through.
+2. **Video Settings**
+   - *Snap_Video_Length* – Optional snapping of frame count to model-specific grids (`No Snap`, `LTX`, `MiniMax`, `Wan`).
+   - *Video_Length* – Number of frames (snapped if selected).
+   - *Overlap_Length* – Frames of overlap between consecutive clips.
+   - *Frame_Rate* – Frames per second.
+   - Start/End indices and times are calculated from Current Generation, Video Length and Overlap.
+   - *First Generation Switch* – Boolean (1 for first clip, 0 otherwise).
+3. **Sampling and Naming Settings**
+   - *steps* – Total sampling steps (snapped to even).
+   - Dual-sampler split method + ratio → `KSampler_1_End_Step` / `KSampler_2_Start_Step`.
+   - *cfg*, *Sampler*, *Scheduler*.
+   - *File Naming* – Project_Name + Scene_Name + optional GenXXX suffix, joined by Delimiter. Empty fields are skipped.
+   - Two free-form path strings (Path_1 / Path_2) for convenience.
 
 **Outputs:**
-1. **Manual Resolution** – The width and height you set in Resolution Settings, passed directly for use in other nodes (e.g., setting canvas size).  
-2. **Calculated Resolution** – The final width and height calculated to match your target aspect ratio, stay within the pixel limit, and align with AI compatibility rules. Used for actual image or video generation.  
-3. **Vid_Length** – The snapped number of video frames (e.g., 81).  
-4. **Vid_Duration** – The video length in seconds (e.g., 81 frames at 16 FPS = 5.0625 seconds).  
-5. **Overlap** – The number of overlapping frames between video segments.  
-6. **Overlap_Duration** – The overlap time in seconds.  
-7. **Start_Index** – The first frame number of the video sequence.  
-8. **Start_Time** – The start time of the sequence in seconds.  
-9. **End_Index** – The last frame number of the sequence.  
-10. **End_Time** – The end time of the sequence in seconds.  
-11. **Frame_Rate** – The frames per second for the video.  
-12. **Gen_Num** – The current generation number (e.g., clip 1, 2).  
-13. **batch_count** – The number of images in the input batch (0 if no image).  
-14. **File_Name** – The final file name, with or without a generation suffix.  
-15. **steps** – The total number of sampling steps (even).  
-16. **KSampler_1_End_Step** – The steps for the first sampler in a dual-sampler setup.  
-17. **KSampler_2_Start_Step** – The starting step for the second sampler.  
-18. **cfg** – The guidance scale for the AI.  
-19. **Sampler** – The chosen sampling algorithm.  
-20. **Scheduler** – The chosen scheduler algorithm.  
-21. **First_Gen_Batch_Switch** – A yes/no signal (1 or 0) for first-clip setup adjustments.
+1. **Resolution_Width_1 / Height_1 / Width_2 / Height_2**
+2. **Vid_Length**, **Vid_Duration**, **Overlap**, **Overlap_Duration**
+3. **Start_Index**, **Start_Time**, **End_Index**, **End_Time**
+4. **Frame_Rate**, **Gen_Num**, **Batch_Count**
+5. **Path_1**, **Path_2**, **File_Name**
+6. **steps**, **KSampler_1_End_Step**, **KSampler_2_Start_Step**
+7. **cfg**, **Sampler**, **Scheduler**
+8. **First_Gen_Batch_Switch**
 
 **Notes:**
-- This node keeps all your settings in one place — resolution, video timing, sampling, and naming.
-- The naming system is flexible: `Project_Scene`, `Project_Gen001`, or just `Scene` — no messy double underscores.
-- Perfect for organizing multi-clip projects with clean, predictable filenames.
+- Cleaner and more flexible than v2 (dual resolutions, model-aware frame snapping, path helpers).
+- Naming still avoids double delimiters.
 
 ---
 
@@ -134,7 +160,7 @@ On the surface, it's yet another brightness and contrast adjuster. However, this
    - `All` *(default)* – Match/Adjust all parameters  
    - `Brightness Only` – Match/Adjust only brightness  
    - `Contrast Only` – Match/Adjust only contrast  
-   - `Saturation Only` – Match/Adjust only contrast  
+   - `Saturation Only` – Match/Adjust only saturation  
    - `Brightness & Contrast` – Match/Adjust brightness & contrast  
    - `Brightness & Saturation` – Match/Adjust brightness & saturation  
    - `Contrast & Saturation` – Match/Adjust contrast & saturation  
@@ -292,6 +318,33 @@ This is a simple math node which was specifically designed to help overcome OOMs
 
 ---
 
+### Python Script (Simple)
+
+![Python Script (Simple)](images/pss_ss.png)
+
+A lightweight, sandboxed Python expression node. Accepts up to 10 optional numeric inputs (A–J). Unconnected inputs default to 0. You write a short script that assigns any of `resultA`–`resultJ`. Only pure math and a small set of safe builtins are allowed (no imports, no file access, no dunder attributes).
+
+Ideal for quick calculations, custom math, or simple logic without leaving the graph.
+
+#### Specifications
+
+**Optional Inputs:**
+- **A** … **J** – Any numeric value (int/float). Unconnected → 0. Booleans are rejected.
+
+**Parameters:**
+1. **script** – Multi-line Python snippet. Must assign at least one of `resultA`–`resultJ`.  
+   Example: `resultA = (A + B) / 2`  
+   The `math` module is available.
+
+**Outputs:**
+1. **ResultA** … **ResultJ** – Values assigned in the script (unset results default to 0)
+
+**Notes:**
+- Strict sandbox: no imports, no attribute access starting with `__`.
+- Only int/float results are accepted.
+
+---
+
 ### Qwen Size Stabilizer (No Longer in this pack. Moved it to ComfyUI-Fossiel-QwenHelpers)
 
 ![Qwen Size Stabilizer](images/qss_ss.png)
@@ -355,12 +408,17 @@ One of the many powerful use cases: if you're not blessed with a monster GPU and
 
 ![SensorSwitches](images/sen_sw_ss.png)
 
-This is a set of 8 switches with a very special ability: Besides being able to function like any other switch, these switches will detect which of their 2 input ports is active and send that to the output. This is particularly useful in workflows where group or node bypassing is present. Let's say, for example, you want to send either a generated or a loaded image to another node's input. You would then connect the VAE Decode node's output to the first input of the Sensor Switch Image node and a Load Image node to the second input. Whichever of the two is not bypassed, will be sent to the destination node. If both inputs are active, the True/False toggle becomes active and the switch works like any other switch.  
+This is a set of switches with a very special ability: Besides being able to function like any other switch, these switches will detect which of their 2 input ports is active and send that to the output. This is particularly useful in workflows where group or node bypassing is present. Let's say, for example, you want to send either a generated or a loaded image to another node's input. You would then connect the VAE Decode node's output to the first input of the Sensor Switch Image node and a Load Image node to the second input. Whichever of the two is not bypassed, will be sent to the destination node. If both inputs are active, the True/False toggle becomes active and the switch works like any other switch.  
 
-*IMPORTANT*: Due to ComfyUI's ability to allow data to pass through a bypassed node, the sensor nodes won't automatically switch when such a pass through situation occurs. To be safe, always switch to the desired input manually. Even with this limitation, these nodes will not error out if an input is not detected, which still makes the extremely useful.  
+Available switches: Image, Clip, Conditioning, Latent, Mask, Model, VAE, **Audio**, and a multi-port KSampler Switch.
+
+*IMPORTANT*: Due to ComfyUI's ability to allow data to pass through a bypassed node, the sensor nodes won't automatically switch when such a pass through situation occurs. To be safe, always switch to the desired input manually. Even with this limitation, these nodes will not error out if an input is not detected, which still makes them extremely useful.  
 
 *Updated 2025/10/31*:  
 The Sensor Switch Latent now also supports the latent format for WAN 2.1 & 2.2
+
+*Updated 2026/10/24*:  
+Added Sensor Switch Audio.
 
 ---
 
@@ -532,6 +590,34 @@ Utilizes the tiler code from [ComfyUI-TiledVAELite](https://github.com/hum-ma/Co
 
 ---
 
+### Video Level Matcher
+
+![Video Level Matcher](images/lvl_mv_ss.png)
+
+Per-frame version of Image Level Matcher designed for video batches. Each frame in the input batch is matched independently against the corresponding frame (or the last available frame) of the optional reference batches. This prevents the “global first-frame only” behaviour of the still-image matcher and eliminates flicker when the reference material also changes over time.
+
+#### Specifications
+
+**Inputs:**
+1. **image** – Batch of frames to adjust (required)  
+2. **Brightness_Ref** – Reference batch for brightness (optional)  
+3. **Contrast_Ref** – Reference batch for contrast (optional)  
+4. **Saturation_Ref** – Reference batch for saturation (optional)  
+
+**Parameters:**  
+1. **Match** – Same options as Image Level Matcher (`All`, `Brightness Only`, etc.)  
+2. **Brightness_offset** / **Contrast_offset** / **Saturation_offset** – Fine-tune offsets  
+3. **Saturation_algorithm** – `Global` or `Midtone-Weighted` (default)
+
+**Outputs:**
+1. **IMAGE** – Adjusted batch (same length as input)
+
+**Notes:**
+- If a reference batch is shorter than the input, the last reference frame is reused for remaining frames.
+- Fully independent per-frame statistics → no temporal averaging.
+
+---
+
 ### WebP Wrangler
 
 ![WebP Wrangler](images/webpw_ss.png)
@@ -581,7 +667,10 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## History
-2026/10/15 - Added video model selector in Pixel Budgeting node.
+2026/10/24 - Added FossielCentralControl_v3 (v2 kept for backwards compatibility).  
+2026/10/24 - Added Video Level Matcher, Add Silence to Audio, Color Match (Passthrough Ports – credit to Kijai), Python Script (Simple).  
+2026/10/24 - Added Sensor Switch Audio.  
+2026/10/15 - Added video model selector in Pixel Budgeting node.  
 2026/10/12 - Added support for MiniMax H3 latents to the Latent IO nodes.  
 2026/10/12 - Bug Fixes in Resolution Wrangler  
 2026/10/12 - Added Text Generate (Expanded) node  
@@ -616,4 +705,5 @@ This node allows you to load and use animated WebP files, as though they were pr
 ## Credits  
 Developed with help from Grok3  
 All the developers who make tools available to everyone using local AI  
-Model developers for supplying fantastic open source models, free of charge.
+Model developers for supplying fantastic open source models, free of charge.  
+**Kijai** – Original ColorMatch node (ComfyUI-KJNodes) which this pack’s Color Match is based on.

@@ -1,13 +1,18 @@
+from .aas import FossielAddSilence
+from .cm import FossielColorMatch
 from .deflicker import FossielVideoDeflicker
 from .dpks import FossielDenoisePrecisionKSampler
 from .fccl import FossielCentralControlLite
 from .fcc_v2 import FossielCentralControl_v2
+from .fcc_v3 import FossielCentralControl_v3
 from .fed import FossielForceEager
 from .ipc import FossielInpaintConditioning
 from .lio import FossielSaveLatent, FossielLoadLatent, FossielLatentListener
 from .lvl_m import FossielLevelMatcher
 from .lvl_ma import FossielLevelMatcherAdvanced
+from .lvl_mv import FossielLevelMatcherVideo
 from .pb import FossielPixelBudget
+from .pss import FossielPythonSimple
 from .resw import FossielResolutionWrangler
 from .reswxp import FossielResolutionWranglerXP
 from .seqw import FossielSequenceWrangler
@@ -24,6 +29,7 @@ from .senswitch import (
     FossielSensorSwitchMask,
     FossielSensorSwitchModel,
     FossielSensorSwitchVAE,
+    FossielSensorSwitchAudio,
     FossielSensorKSamplerSwitch
 )
 from .svlm2 import (
@@ -35,8 +41,11 @@ from .svlm2 import (
 )
 
 NODE_CLASS_MAPPINGS = {
+    "FossielAddSilence": FossielAddSilence,
     "FossielCentralControlLite": FossielCentralControlLite,
     "FossielCentralControl_v2": FossielCentralControl_v2,
+    "FossielCentralControl_v3": FossielCentralControl_v3,
+    "FossielColorMatch": FossielColorMatch,
     "FossielDenoisePrecisionKSampler": FossielDenoisePrecisionKSampler,
     "FossielForceEager": FossielForceEager,
     "FossielInpaintConditioning": FossielInpaintConditioning,
@@ -45,7 +54,9 @@ NODE_CLASS_MAPPINGS = {
     "FossielSaveLatent": FossielSaveLatent,
     "FossielLevelMatcher": FossielLevelMatcher,
     "FossielLevelMatcherAdvanced": FossielLevelMatcherAdvanced,
+    "FossielLevelMatcherVideo": FossielLevelMatcherVideo,
     "FossielPixelBudget": FossielPixelBudget,
+    "FossielPythonSimple": FossielPythonSimple,
     "FossielResolutionWrangler": FossielResolutionWrangler,
     "FossielResolutionWranglerXP": FossielResolutionWranglerXP,
     "Fossiel_Sensor_Switch_Image": FossielSensorSwitchImage,
@@ -55,6 +66,7 @@ NODE_CLASS_MAPPINGS = {
     "Fossiel_Sensor_Switch_Mask": FossielSensorSwitchMask,
     "Fossiel_Sensor_Switch_Model": FossielSensorSwitchModel,
     "Fossiel_Sensor_Switch_VAE": FossielSensorSwitchVAE,
+    "Fossiel_Sensor_Switch_Audio": FossielSensorSwitchAudio,
     "Fossiel_Sensor_KSampler_Switch": FossielSensorKSamplerSwitch,
     "FossielSequenceWrangler": FossielSequenceWrangler,
     "Fossiel_LoadSmolLM2Model": Fossiel_Load_SmolLM2_Model,
@@ -71,8 +83,11 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "FossielAddSilence": "Add Silence to Audio",
     "FossielCentralControlLite": "Fossiel Central Control Lite",
     "FossielCentralControl_v2": "Fossiel Central Control v2",
+    "FossielCentralControl_v3": "Fossiel Central Control v3",
+    "FossielColorMatch": "Color Match (Passthrough Ports)",
     "FossielDenoisePrecisionKSampler": "Denoise Precision KSampler",
     "FossielForceEager": "Force Eager DeltaNet",
     "FossielInpaintConditioning": "Latent Passthrough Inpaint Conditioning",
@@ -81,7 +96,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FossielSaveLatent": "Save Latent to Path",
     "FossielLevelMatcher": "Image Level Matcher",
     "FossielLevelMatcherAdvanced": "Image Level Matcher (Advanced)",
+    "FossielLevelMatcherVideo": "Video Level Matcher",
     "FossielPixelBudget": "Pixel Budgeting",
+    "FossielPythonSimple": "Python Script (Simple)",
     "FossielResolutionWrangler": "Resolution Wrangler",
     "FossielResolutionWranglerXP": "Resolution Wrangler (Express)",
     "Fossiel_Sensor_Switch_Image": "Sensor Switch Image",
@@ -91,6 +108,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Fossiel_Sensor_Switch_Mask": "Sensor Switch Mask",
     "Fossiel_Sensor_Switch_Model": "Sensor Switch Model",
     "Fossiel_Sensor_Switch_VAE": "Sensor Switch VAE",
+    "Fossiel_Sensor_Switch_Audio": "Sensor Switch Audio",
     "Fossiel_Sensor_KSampler_Switch": "Sensor KSampler Switch",
     "Fossiel_LoadSmolLM2Model": "Load SmolLM2 Model (Fossiel_QoL)",
     "Fossiel_LoadSmolVLMModel": "Load SmolVLM / SmolVLM2 Model (Fossiel_QoL)",

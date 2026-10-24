@@ -214,6 +214,33 @@ class FossielSensorSwitchVAE:
             return (vae_true if switch else vae_false,)
         return (None,)
 
+class FossielSensorSwitchAudio:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "switch": ("BOOLEAN", {"default": True}),
+            },
+            "optional": {
+                "audio_true": ("AUDIO",),
+                "audio_false": ("AUDIO",),
+            }
+        }
+
+    RETURN_TYPES = ("AUDIO",)
+    RETURN_NAMES = ("audio",)
+    FUNCTION = "switch"
+    CATEGORY = "Fossiel/QoL"
+
+    def switch(self, switch, audio_true=None, audio_false=None):
+        if audio_true is not None and audio_false is None:
+            return (audio_true,)
+        if audio_false is not None and audio_true is None:
+            return (audio_false,)
+        if audio_true is not None and audio_false is not None:
+            return (audio_true if switch else audio_false,)
+        return (None,)
+
 class FossielSensorKSamplerSwitch:
     @classmethod
     def INPUT_TYPES(cls):

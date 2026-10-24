@@ -78,7 +78,7 @@ class FossielTimeFormatter:
                 "Time_sec": (any, { "default": 0.00000 }),
             },
             "required": {
-                "Frames_per_sec": ("INT", {"default": 16, "min": 1, "max": 2000, "step": 1}),
+                "Frames_per_sec": ("FLOAT", {"default": 16, "min": 1.000, "max": 2000.000, "step": 1.000}),
                 "Time_format": ([
                     "Frames",
                     "Time (sec)",
@@ -132,7 +132,7 @@ class FossielTimeFormatter:
                 hours = int(seconds // 3600)
                 minutes = int((seconds % 3600) // 60)
                 secs = int(seconds % 60)
-                frame_part = frames % Frames_per_sec
+                frame_part = int((frames % fps)+0.5)
                 formatted = f"{hours:02d}:{minutes:02d}:{secs:02d}:{frame_part:02d}"
             elif Time_format == "HH:MM:SS:msec":
                 hours = int(seconds // 3600)

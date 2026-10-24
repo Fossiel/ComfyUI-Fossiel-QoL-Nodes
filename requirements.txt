@@ -1,4 +1,6 @@
 Pillow
 numpy
-num2words
 webp
+color-matcher
+opencv-python
+transformers

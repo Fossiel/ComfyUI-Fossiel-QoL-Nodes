@@ -683,6 +683,7 @@ To run the script, simply open a terminal at the script's location and run `pyth
 ---
 
 ## History
+2026/10/30 - Added reswrangler_sa.py standalone script.  
 2026/10/24 - Added FossielCentralControl_v3 (v2 kept for backwards compatibility).  
 2026/10/24 - Added Video Level Matcher, Add Silence to Audio, Color Match (Passthrough Ports – credit to Kijai), Python Script (Simple).  
 2026/10/24 - Added Sensor Switch Audio.  

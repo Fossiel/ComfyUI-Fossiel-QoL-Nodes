@@ -656,6 +656,22 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 ---
 
+## Standalone Scripts
+
+### reswrangler_sa.py
+
+This cli script currently provides 2 simple, yet effective options for calculating coherent, non-fractional resolutions and aspect ratios. It is incredibly handy when preparing images in an external photo editor. The script prompts for inputs with clear language, making it very easy to use.  
+
+To run the script, simply open a terminal at the script's location and run `python3 reswrangler_sa.py` in Linux/Mac or `python reswrangler_sa.py` in Windows. 
+
+#### Specifications
+
+1. **Best Fitting Coherent Aspect Ratio for Given Size** - Uses our algorithm from the Resolution Wrangler node to calculate the best fitting resolution and aspect ratio for a given size.  
+2. **Closest Size Given Coherent Aspect and 1 Side** - Receives an integer aspect ratio and the length of one side of an image and then calculates the length of both sides that will fit the given aspect.
+ 
+---
+---
+
 ### Installation Instructions
 1. Clone or download this repository to your local machine.
 2. Copy the repository folder to your ComfyUI custom nodes directory: `ComfyUI/custom_nodes/`
@@ -703,7 +719,7 @@ This node allows you to load and use animated WebP files, as though they were pr
 ---
 
 ## Credits  
-Developed with help from Grok3  
+Developed with help from Grok3 and newer.  
 All the developers who make tools available to everyone using local AI  
 Model developers for supplying fantastic open source models, free of charge.  
 **Kijai** – Original ColorMatch node (ComfyUI-KJNodes) which this pack’s Color Match is based on.

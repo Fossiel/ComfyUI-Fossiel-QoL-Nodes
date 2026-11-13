@@ -6,11 +6,15 @@ import numpy as np
 from PIL import Image
 from transformers import (
     AutoProcessor,
-    AutoModelForVision2Seq,
-    AutoModelForImageTextToText,
     AutoTokenizer,
     AutoModelForCausalLM
 )
+
+try:
+    from transformers import AutoModelForImageTextToText
+except ImportError:
+    from transformers import AutoModelForVision2Seq
+
 #from .imagefunc import log, tensor2pil
 
 
@@ -18,6 +22,7 @@ smollm2_repo_local = {
     "SmolLM2-135M-Instruct": "smol/SmolLM2-135M-Instruct",
     "SmolLM2-360M-Instruct": "smol/SmolLM2-360M-Instruct",
     "SmolLM2-1.7B-Instruct": "smol/SmolLM2-1.7B-Instruct",
+    "SmolLM2-1.7B-Instruct-Uncensored": "smol/SmolLM2-1.7B-Instruct-Uncensored",
 }
 
 smolvlm_all_local = {
@@ -196,10 +201,12 @@ class Fossiel_SmolLM2:
     def INPUT_TYPES(cls):
         return {"required":{
                     "smolLM2_model": ("SmolLM2_MODEL",),
-                    "max_new_tokens": ("INT", {"default": 480, "min": 1, "max": 4096}),
+                    "max_new_tokens": ("INT", {"default": 512, "min": 1, "max": 4096}),
                     "do_sample": ("BOOLEAN", {"default": True}),
-                    "temperature": ("FLOAT", {"default": 0.5, "min": 0.0, "step": 0.1}),
-                    "top_p": ("FLOAT", {"default": 0.9, "min": 0.0, "max": 1.0, "step": 0.1}),
+                    # New seeding parameters (KSampler style)
+                    "seed": ("INT", {"default": 0, "min": 0, "max": 99999999, "control_after_generate": True}),
+                    "temperature": ("FLOAT", {"default": 0.5, "min": 0.0, "step": 0.01}),
+                    "top_p": ("FLOAT", {"default": 0.9, "min": 0.0, "max": 1.0, "step": 0.01}),
                     "system_prompt": ("STRING", {"default": "You are an expert prompt engineer for AI image generation. Your task is to take a very short or basic idea and expand it into a rich, detailed, high-quality prompt optimized for modern image and video generation models. Avoid writing a story. Avoid naming characters.", "multiline": True}),
                     "user_prompt": ("STRING", {"default": "Basic prompt.", "multiline": True}),
                 },
@@ -210,17 +217,50 @@ class Fossiel_SmolLM2:
     FUNCTION = "smollm2"
     CATEGORY = 'Fossiel_QoL_Nodes'
 
-    def smollm2(self, smolLM2_model, max_new_tokens, do_sample, temperature, top_p, system_prompt, user_prompt):
+    def smollm2(self, smolLM2_model, max_new_tokens, do_sample, temperature, top_p, 
+                system_prompt, user_prompt, seed):
+
         tokenizer = smolLM2_model["tokenizer"]
         model = smolLM2_model["model"]
         device = smolLM2_model["device"]
+
+#        # === Seeding logic (KSampler style) ===
+#        if control_after_generate == "fixed":
+#            final_seed = seed
+#        elif control_after_generate == "increment":
+#            final_seed = seed + 1
+#        elif control_after_generate == "decrement":
+#            final_seed = seed - 1 if seed > 0 else 0
+#        else:  # "random"
+#            final_seed = torch.randint(0, 99999999, (1,)).item()
+
+        # Apply the seed
+        final_seed = seed
+        torch.manual_seed(final_seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(final_seed)
+        import random
+        import numpy as np
+        random.seed(final_seed)
+        np.random.seed(final_seed)
+
+        # === Generation ===
         messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
         input_text = tokenizer.apply_chat_template(messages, tokenize=False)
         inputs = tokenizer.encode(input_text, return_tensors="pt").to(device)
-        outputs = model.generate(inputs, max_new_tokens=max_new_tokens, temperature=temperature, top_p=top_p, do_sample=do_sample)
+
+        outputs = model.generate(
+            inputs,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            do_sample=do_sample
+        )
+
         ret_text = tokenizer.decode(outputs[0])
         ret_text = split_lm2_content(ret_text)
-        log(f"{self.NODE_NAME} response is: {ret_text}")
+        log(f"{self.NODE_NAME} response (seed={final_seed}) is: {ret_text}")
+
         return (ret_text,)
 
 
@@ -296,6 +336,8 @@ class Fossiel_SmolVLM2:
         return {"required":{
                     "smolVLM_model": ("SmolVLM_MODEL",),
                     "max_new_tokens": ("INT", {"default": 384, "min": 1, "max": 4096}),
+                    # New seeding parameters (KSampler style)
+                    "seed": ("INT", {"default": 0, "min": 0, "max": 99999999, "control_after_generate": True}),
                     "user_prompt": ("STRING", {"default": "Describe this image in detail including descriptions of the poses and facial features and facial expressions of characters.", "multiline": True}),
                 },
                 "optional": {
@@ -309,7 +351,8 @@ class Fossiel_SmolVLM2:
     OUTPUT_IS_LIST = (True,)
     CATEGORY = 'Fossiel_QoL_Nodes'
 
-    def smolvlm2(self, smolVLM_model, max_new_tokens, user_prompt, image=None):
+    def smolvlm2(self, smolVLM_model, max_new_tokens, user_prompt, seed, image=None):
+
         if smolVLM_model["family"] != "smolvlm2":
             raise ValueError(f"Wrong model family ({smolVLM_model.get('family', 'unknown')}). Use Fossiel_SmolVLM_Classic for original SmolVLM.")
 
@@ -323,6 +366,28 @@ class Fossiel_SmolVLM2:
 
         is_video_like = len(image) > 1
         log(f"{self.NODE_NAME} treating input as {'video-like (multi-frame)' if is_video_like else 'single image'}")
+
+#        # === Seeding logic (KSampler style) ===
+#        if control_after_generate == "fixed":
+#            final_seed = seed
+#        elif control_after_generate == "increment":
+#            final_seed = seed + 1
+#        elif control_after_generate == "decrement":
+#            final_seed = seed - 1 if seed > 0 else 0
+#        else:  # "random"
+#            final_seed = torch.randint(0, 99999999, (1,)).item()
+
+        # Apply the seed
+        final_seed = seed
+        torch.manual_seed(final_seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(final_seed)
+        import random
+        import numpy as np
+        random.seed(final_seed)
+        np.random.seed(final_seed)
+
+        log(f"{self.NODE_NAME} generation started with seed={final_seed}")
 
         content = []
 
@@ -356,6 +421,6 @@ class Fossiel_SmolVLM2:
         )
         result = split_vlm_content(generated_texts[0])
         ret_text.append(result)
-        log(f"{self.NODE_NAME} response is: {result}")
+        log(f"{self.NODE_NAME} response (seed={final_seed}) is: {result}")
 
         return (ret_text,)
